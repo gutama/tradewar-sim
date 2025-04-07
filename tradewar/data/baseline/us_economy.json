@@ -1,0 +1,38 @@
+{
+  "name": "US",
+  "gdp": 21.43,
+  "population": 331000000,
+  "inflation_rate": 0.021,
+  "unemployment_rate": 0.039,
+  "interest_rate": 0.015,
+  "currency_value": 1.0,
+  "sectors": {
+    "technology": 0.25,
+    "services": 0.40,
+    "manufacturing": 0.15,
+    "agriculture": 0.02,
+    "healthcare": 0.10,
+    "natural_resources": 0.05,
+    "education": 0.03
+  },
+  "trading_partners": {
+    "China": 0.16,
+    "Mexico": 0.14,
+    "Canada": 0.15,
+    "Japan": 0.05,
+    "Germany": 0.05,
+    "Indonesia": 0.01
+  },
+  "historical_gdp_growth": [
+    0.023,
+    0.029,
+    0.018,
+    0.024,
+    0.020
+  ],
+  "policy_characteristics": {
+    "protectionism_tendency": 0.7,
+    "retaliation_factor": 0.9,
+    "negotiation_willingness": 0.5
+  }
+}

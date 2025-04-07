@@ -1,0 +1,38 @@
+{
+  "name": "Indonesia",
+  "gdp": 1.06,
+  "population": 273500000,
+  "inflation_rate": 0.031,
+  "unemployment_rate": 0.057,
+  "interest_rate": 0.045,
+  "currency_value": 1.0,
+  "sectors": {
+    "agriculture": 0.15,
+    "natural_resources": 0.25,
+    "manufacturing": 0.20,
+    "services": 0.30,
+    "tourism": 0.08,
+    "technology": 0.02
+  },
+  "trading_partners": {
+    "China": 0.20,
+    "US": 0.10,
+    "Japan": 0.09,
+    "Singapore": 0.08,
+    "India": 0.07,
+    "EU": 0.12
+  },
+  "historical_gdp_growth": [
+    0.050,
+    0.051,
+    0.047,
+    0.042,
+    0.039
+  ],
+  "policy_characteristics": {
+    "protectionism_tendency": 0.5,
+    "retaliation_factor": 0.6,
+    "negotiation_willingness": 0.8,
+    "resource_nationalism": 0.7
+  }
+}

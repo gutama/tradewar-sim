@@ -1,0 +1,39 @@
+{
+  "name": "China",
+  "gdp": 14.72,
+  "population": 1402000000,
+  "inflation_rate": 0.025,
+  "unemployment_rate": 0.043,
+  "interest_rate": 0.037,
+  "currency_value": 1.0,
+  "sectors": {
+    "manufacturing": 0.35,
+    "technology": 0.15,
+    "services": 0.25,
+    "agriculture": 0.08,
+    "natural_resources": 0.10,
+    "rare_earth_minerals": 0.05,
+    "education": 0.02
+  },
+  "trading_partners": {
+    "US": 0.17,
+    "EU": 0.15,
+    "Japan": 0.08,
+    "South Korea": 0.06,
+    "Australia": 0.04,
+    "Indonesia": 0.02
+  },
+  "historical_gdp_growth": [
+    0.062,
+    0.069,
+    0.061,
+    0.059,
+    0.052
+  ],
+  "policy_characteristics": {
+    "protectionism_tendency": 0.6,
+    "retaliation_factor": 1.0,
+    "negotiation_willingness": 0.7,
+    "state_control_factor": 0.8
+  }
+}
