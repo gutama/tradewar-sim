@@ -21,13 +21,20 @@ except ImportError:
     ANTHROPIC_AVAILABLE = False
     logger.warning("Anthropic package not available. Anthropic LLM provider will not work.")
 
+try:
+    import litellm
+    LITELLM_AVAILABLE = True
+except ImportError:
+    LITELLM_AVAILABLE = False
+    logger.warning("LiteLLM package not available. LiteLLM provider will not work.")
+
 
 class LLMClient:
     """
     Client for interacting with large language models.
     
     This class provides a unified interface for different LLM providers
-    (like OpenAI, Anthropic, etc.) to generate text completions for
+    (like OpenAI, Anthropic, LiteLLM, etc.) to generate text completions for
     trade policy simulations.
     """
     
@@ -43,7 +50,7 @@ class LLMClient:
         Initialize the LLM client.
         
         Args:
-            provider: LLM provider (openai, anthropic)
+            provider: LLM provider (openai, anthropic, litellm)
             api_key: API key for the provider
             model: Model to use for generation
             temperature: Sampling temperature
@@ -73,6 +80,13 @@ class LLMClient:
             
             self.client = anthropic.Anthropic(api_key=self.api_key)
         
+        elif self.provider == "litellm":
+            if not LITELLM_AVAILABLE:
+                raise ImportError("LiteLLM package not installed. Run 'pip install litellm'")
+            
+            litellm.api_key = self.api_key
+            self.client = litellm
+            
         else:
             raise ValueError(f"Unsupported LLM provider: {self.provider}")
     
@@ -100,6 +114,8 @@ class LLMClient:
                 return self._generate_openai(prompt, system_message, stop_sequences, **kwargs)
             elif self.provider == "anthropic":
                 return self._generate_anthropic(prompt, system_message, stop_sequences, **kwargs)
+            elif self.provider == "litellm":
+                return self._generate_litellm(prompt, system_message, stop_sequences, **kwargs)
             else:
                 raise ValueError(f"Unsupported provider: {self.provider}")
         
@@ -152,3 +168,29 @@ class LLMClient:
         )
         
         return response.completion
+    
+    def _generate_litellm(
+        self, 
+        prompt: str,
+        system_message: Optional[str],
+        stop_sequences: Optional[List[str]],
+        **kwargs
+    ) -> str:
+        """Generate a response using LiteLLM's unified API."""
+        messages = []
+        
+        if system_message:
+            messages.append({"role": "system", "content": system_message})
+        
+        messages.append({"role": "user", "content": prompt})
+        
+        response = self.client.completion(
+            model=self.model,
+            messages=messages,
+            temperature=kwargs.get("temperature", self.temperature),
+            max_tokens=kwargs.get("max_tokens", self.max_tokens),
+            stop=stop_sequences,
+            api_key=self.api_key
+        )
+        
+        return response.choices[0].message.content

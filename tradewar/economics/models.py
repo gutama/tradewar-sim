@@ -18,6 +18,9 @@ class Country:
     interest_rate: float = 0.0
     currency_value: float = 1.0
     sectors: Dict[str, float] = field(default_factory=dict)
+    trading_partners: Dict[str, float] = field(default_factory=dict)
+    historical_gdp_growth: List[float] = field(default_factory=list)  # Add this field
+    policy_characteristics: Dict[str, float] = field(default_factory=dict)  # Add this field
     
     def __eq__(self, other):
         if not isinstance(other, Country):
