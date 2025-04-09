@@ -42,8 +42,8 @@ dev = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/tradewar-sim"
-"Bug Tracker" = "https://github.com/yourusername/tradewar-sim/issues"
+"Homepage" = "https://github.com/gutama/tradewar-sim"
+"Bug Tracker" = "https://github.com/gutama/tradewar-sim/issues"
 
 [tool.setuptools]
 packages = ["tradewar"]
