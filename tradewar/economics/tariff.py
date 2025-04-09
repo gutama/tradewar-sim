@@ -1,23 +1,26 @@
 """Tariff impact calculations for the trade war simulation."""
 
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, TYPE_CHECKING
 
 import numpy as np
 
 from tradewar.economics.models import Country, TariffPolicy
-from tradewar.simulation.state import SimulationState, TariffImpact
+
+# Use TYPE_CHECKING to avoid circular imports
+if TYPE_CHECKING:
+    from tradewar.simulation.state import SimulationState, TariffImpact
 
 logger = logging.getLogger(__name__)
 
 
 def calculate_tariff_impact(
-    state: SimulationState,
+    state: "SimulationState",
     policy: TariffPolicy, 
     imposing_country: Country,
     targeted_country: Country,
     elasticity_multiplier: float = 1.0
-) -> TariffImpact:
+) -> "TariffImpact":
     """
     Calculate the economic impact of a tariff policy.
     
@@ -31,6 +34,9 @@ def calculate_tariff_impact(
     Returns:
         Object containing calculated impacts on both economies
     """
+    # Import here to avoid circular import
+    from tradewar.simulation.state import TariffImpact
+    
     logger.info(
         f"Calculating impact of {imposing_country.name}'s tariffs on {targeted_country.name}"
     )
@@ -109,7 +115,7 @@ def calculate_tariff_impact(
 
 
 def calculate_optimal_tariff(
-    state: SimulationState,
+    state: "SimulationState",
     imposing_country: Country,
     targeted_country: Country,
     objective: str = "welfare"
@@ -155,7 +161,7 @@ def calculate_optimal_tariff(
 
 
 def _estimate_trade_elasticities(
-    state: SimulationState, 
+    state: "SimulationState", 
     country1: Country, 
     country2: Country
 ) -> Dict[str, float]:

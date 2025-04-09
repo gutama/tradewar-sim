@@ -2,18 +2,21 @@
 
 import logging
 import random
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 
 from tradewar.economics.models import Country, EconomicAction, EventConfig, TariffPolicy
-from tradewar.simulation.state import SimulationState
+
+# Use TYPE_CHECKING for circular imports
+if TYPE_CHECKING:
+    from tradewar.simulation.state import SimulationState
 
 logger = logging.getLogger(__name__)
 
 
 def calculate_gdp_impact(
-    state: SimulationState, 
+    state: "SimulationState", 
     country: Country,
     year: int,
     quarter: int
@@ -89,7 +92,7 @@ def _get_baseline_quarterly_growth(country: Country) -> float:
     return quarterly_rate
 
 
-def _calculate_tariff_gdp_impact(state: SimulationState, country: Country) -> float:
+def _calculate_tariff_gdp_impact(state: "SimulationState", country: Country) -> float:
     """
     Calculate GDP impact from tariffs imposed on and by this country.
     
@@ -136,7 +139,7 @@ def _calculate_tariff_gdp_impact(state: SimulationState, country: Country) -> fl
     return outgoing_tariff_impact + incoming_tariff_impact
 
 
-def _calculate_trade_gdp_impact(state: SimulationState, country: Country) -> float:
+def _calculate_trade_gdp_impact(state: "SimulationState", country: Country) -> float:
     """
     Calculate GDP impact from changes in trade flows.
     
@@ -205,7 +208,7 @@ def _calculate_trade_gdp_impact(state: SimulationState, country: Country) -> flo
     return export_growth * export_to_gdp_ratio
 
 
-def _calculate_investment_gdp_impact(state: SimulationState, country: Country) -> float:
+def _calculate_investment_gdp_impact(state: "SimulationState", country: Country) -> float:
     """
     Calculate GDP impact from investment policy actions.
     
@@ -232,7 +235,7 @@ def _calculate_investment_gdp_impact(state: SimulationState, country: Country) -
     return impact
 
 
-def _calculate_event_gdp_impact(state: SimulationState, country: Country) -> float:
+def _calculate_event_gdp_impact(state: "SimulationState", country: Country) -> float:
     """
     Calculate GDP impact from external events.
     
@@ -254,7 +257,7 @@ def _calculate_event_gdp_impact(state: SimulationState, country: Country) -> flo
     return impact
 
 
-def _calculate_global_economy_impact(state: SimulationState) -> float:
+def _calculate_global_economy_impact(state: "SimulationState") -> float:
     """
     Calculate GDP impact from global economic conditions.
     

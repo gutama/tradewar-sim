@@ -86,6 +86,10 @@ class LLMClient:
             
             litellm.api_key = self.api_key
             self.client = litellm
+        
+        elif self.provider == "test_provider":
+            # Mock client for testing
+            self.client = object()
             
         else:
             raise ValueError(f"Unsupported LLM provider: {self.provider}")

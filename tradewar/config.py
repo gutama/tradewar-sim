@@ -67,7 +67,7 @@ def load_config() -> Config:
         llm=LLMConfig(
             provider=os.getenv("LLM_PROVIDER", "litellm"),
             api_key=os.getenv("OPENAI_API_KEY", ""),
-            model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
+            model=os.getenv("LLM_MODEL", "gpt-4o"),
             temperature=float(os.getenv("LLM_TEMPERATURE", "0.7")),
             max_tokens=int(os.getenv("LLM_MAX_TOKENS", "1024")),
         ),

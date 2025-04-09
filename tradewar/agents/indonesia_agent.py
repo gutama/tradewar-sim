@@ -31,6 +31,7 @@ class IndonesiaAgent(BaseAgent):
             strategy_params: Parameters to customize Indonesia's policy strategy
             llm_client: Optional LLM client for policy generation
         """
+        strategy_params = strategy_params or {}
         super().__init__(country, strategy_params)
         self.llm_client = llm_client
         self.protectionist_tendency = strategy_params.get("protectionist_tendency", 0.5)

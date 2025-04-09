@@ -31,6 +31,7 @@ class USAgent(BaseAgent):
             strategy_params: Parameters to customize US policy strategy
             llm_client: Optional LLM client for policy generation
         """
+        strategy_params = strategy_params or {}
         super().__init__(country, strategy_params)
         self.llm_client = llm_client
         self.is_aggressive = strategy_params.get("is_aggressive", True)

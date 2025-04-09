@@ -2,19 +2,21 @@
 
 import logging
 import random
-from typing import Dict, List, Optional, Tuple
-from tradewar.economics.models import TariffPolicy
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 
-from tradewar.economics.models import Country, TradeFlow
-from tradewar.simulation.state import SimulationState
+from tradewar.economics.models import Country, TradeFlow, TariffPolicy
+
+# Use TYPE_CHECKING for circular imports
+if TYPE_CHECKING:
+    from tradewar.simulation.state import SimulationState
 
 logger = logging.getLogger(__name__)
 
 
 def update_trade_balance(
-    state: SimulationState,
+    state: "SimulationState",
     country1: Country,
     country2: Country,
     year: Optional[int] = None,
@@ -62,7 +64,7 @@ def update_trade_balance(
 
 
 def _get_previous_trade_flows(
-    state: SimulationState,
+    state: "SimulationState",
     country1: Country,
     country2: Country,
     year: int,
@@ -176,7 +178,7 @@ def _create_baseline_trade_flow(
 
 
 def _calculate_updated_trade_flow(
-    state: SimulationState,
+    state: "SimulationState",
     exporter: Country,
     importer: Country,
     tariff_policies: List[TariffPolicy],
@@ -328,7 +330,7 @@ def _get_sector_price_elasticity(sector: str) -> float:
 def _calculate_base_growth_rate(
     exporter: Country, 
     importer: Country, 
-    state: SimulationState
+    state: "SimulationState"
 ) -> float:
     """
     Calculate the base growth rate for trade between two countries.

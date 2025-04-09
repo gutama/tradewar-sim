@@ -1,10 +1,13 @@
 """Base agent class defining the interface for all country-specific agents."""
 
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TYPE_CHECKING
 
 from tradewar.economics.models import Country, EconomicAction, TariffPolicy
-from tradewar.simulation.state import SimulationState
+
+# Use TYPE_CHECKING to avoid circular imports at runtime
+if TYPE_CHECKING:
+    from tradewar.simulation.state import SimulationState
 
 
 class BaseAgent(ABC):
@@ -28,7 +31,7 @@ class BaseAgent(ABC):
         self.previous_actions: List[EconomicAction] = []
     
     @abstractmethod
-    def decide_action(self, state: SimulationState) -> EconomicAction:
+    def decide_action(self, state: "SimulationState") -> EconomicAction:
         """
         Decide the next economic action based on current simulation state.
         
@@ -42,7 +45,7 @@ class BaseAgent(ABC):
     
     @abstractmethod
     def calculate_tariff_policy(
-        self, state: SimulationState, target_country: Country
+        self, state: "SimulationState", target_country: Country
     ) -> TariffPolicy:
         """
         Calculate tariff policy toward a target country.
@@ -56,7 +59,7 @@ class BaseAgent(ABC):
         """
         pass
     
-    def update_strategy(self, state: SimulationState) -> None:
+    def update_strategy(self, state: "SimulationState") -> None:
         """
         Update internal strategy based on simulation developments.
         
