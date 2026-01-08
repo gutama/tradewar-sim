@@ -267,4 +267,137 @@ class EventGenerator:
         setattr(pandemic_event, "one_time", True)
         events.append(pandemic_event)
         
+        # Semiconductor shortage
+        events.append(
+            EventConfig(
+                name="Global Semiconductor Shortage",
+                probability=0.025,  # 2.5% chance per quarter
+                affected_countries={"US", "China", "Indonesia"},
+                affected_sectors={"semiconductors", "technology", "automotive", "manufacturing"},
+                gdp_impact={
+                    "US": -0.012,      # -1.2% GDP growth
+                    "China": -0.015,   # -1.5% GDP growth
+                    "Indonesia": -0.008, # -0.8% GDP growth
+                },
+                duration_quarters=4,
+                description="Critical shortage of semiconductors impacting tech and automotive industries"
+            )
+        )
+        
+        # AI breakthrough
+        events.append(
+            EventConfig(
+                name="Major AI Breakthrough",
+                probability=0.015,  # 1.5% chance per quarter
+                affected_countries={"US", "China"},
+                affected_sectors={"ai", "technology", "services"},
+                gdp_impact={
+                    "US": 0.015,     # +1.5% GDP growth
+                    "China": 0.012,  # +1.2% GDP growth
+                },
+                duration_quarters=8,
+                description="Breakthrough in artificial intelligence technology"
+            )
+        )
+        
+        # EV market disruption
+        events.append(
+            EventConfig(
+                name="Electric Vehicle Market Disruption",
+                probability=0.02,  # 2% chance per quarter
+                affected_countries={"US", "China"},
+                affected_sectors={"automotive", "batteries", "green_tech"},
+                gdp_impact={
+                    "US": -0.005,    # -0.5% GDP growth
+                    "China": 0.015,  # +1.5% GDP growth (EV leader)
+                },
+                duration_quarters=6,
+                description="Major shift in global electric vehicle market dynamics"
+            )
+        )
+        
+        # Critical minerals shortage
+        events.append(
+            EventConfig(
+                name="Rare Earth Minerals Crisis",
+                probability=0.02,  # 2% chance per quarter
+                affected_countries={"US", "China", "Indonesia"},
+                affected_sectors={"mining", "green_tech", "semiconductors", "manufacturing"},
+                gdp_impact={
+                    "US": -0.01,       # -1% GDP growth
+                    "China": 0.005,    # +0.5% GDP growth (supplier advantage)
+                    "Indonesia": 0.008, # +0.8% GDP growth (resource rich)
+                },
+                duration_quarters=4,
+                description="Shortage of critical rare earth minerals for technology production"
+            )
+        )
+        
+        # Cyber attack on infrastructure
+        events.append(
+            EventConfig(
+                name="Major Cyber Attack on Infrastructure",
+                probability=0.015,  # 1.5% chance per quarter
+                affected_countries={"US", "China", "Indonesia"},
+                affected_sectors={"technology", "services", "energy", "banking"},
+                gdp_impact={
+                    "US": -0.015,      # -1.5% GDP growth
+                    "China": -0.01,    # -1% GDP growth
+                    "Indonesia": -0.012, # -1.2% GDP growth
+                },
+                duration_quarters=2,
+                description="Large-scale cyber attack affecting critical digital infrastructure"
+            )
+        )
+        
+        # Green technology subsidy war
+        events.append(
+            EventConfig(
+                name="Green Technology Subsidy Race",
+                probability=0.03,  # 3% chance per quarter
+                affected_countries={"US", "China"},
+                affected_sectors={"green_tech", "manufacturing", "energy"},
+                gdp_impact={
+                    "US": 0.008,     # +0.8% GDP growth
+                    "China": 0.01,   # +1% GDP growth
+                },
+                duration_quarters=8,
+                description="Major government subsidies for green technology development create competitive advantages"
+            )
+        )
+        
+        # Regional trade agreement
+        events.append(
+            EventConfig(
+                name="New Regional Trade Agreement",
+                probability=0.02,  # 2% chance per quarter
+                affected_countries={"Indonesia", "China"},
+                affected_sectors={"all"},
+                gdp_impact={
+                    "Indonesia": 0.015,  # +1.5% GDP growth
+                    "China": 0.01,       # +1% GDP growth
+                    "US": -0.005,        # -0.5% GDP growth (excluded)
+                },
+                duration_quarters=12,
+                description="Formation of new regional trade bloc affecting trade patterns"
+            )
+        )
+        
+        # Supply chain nearshoring wave
+        events.append(
+            EventConfig(
+                name="Supply Chain Nearshoring Wave",
+                probability=0.025,  # 2.5% chance per quarter
+                affected_countries={"US", "China", "Indonesia"},
+                affected_sectors={"manufacturing", "technology"},
+                gdp_impact={
+                    "US": 0.01,        # +1% GDP growth
+                    "Indonesia": 0.015, # +1.5% GDP growth (beneficiary)
+                    "China": -0.012,    # -1.2% GDP growth (loses manufacturing)
+                },
+                duration_quarters=8,
+                description="Companies relocate supply chains closer to home markets"
+            )
+        )
+        
         return events

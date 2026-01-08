@@ -42,6 +42,13 @@ class ActionType(str, Enum):
     INVESTMENT = "investment"
     CURRENCY_DEVALUATION = "currency_devaluation"
     STATUS_QUO = "status_quo"
+    # New action types based on 2024-2026 trade dynamics
+    TECH_EXPORT_CONTROL = "tech_export_control"
+    INDUSTRIAL_SUBSIDY = "industrial_subsidy"
+    SUPPLY_CHAIN_DIVERSIFICATION = "supply_chain_diversification"
+    GREEN_TECH_INVESTMENT = "green_tech_investment"
+    FRIEND_SHORING = "friend_shoring"
+    DATA_SOVEREIGNTY = "data_sovereignty"
 
 
 @dataclass

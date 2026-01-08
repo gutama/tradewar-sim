@@ -30,17 +30,19 @@ def generate_china_policy_prompt(
     economic_context = create_economic_context(state, country)
     country_context = create_country_context(country)
     
-    # China-specific additions
+    # China-specific additions - updated for 2024-2026 era
     china_policy_focus = """
-CHINESE GOVERNMENT POLICY PRIORITIES
-- Economic Stability: Maintaining GDP growth targets and social stability
-- Made in China 2025: Advancing technological self-sufficiency in key industries
-- Export Market Access: Preserving access to major export markets, especially the US and EU
-- Controlled Retaliation: Responding to trade aggression while avoiding excessive escalation
-- Strategic Resources: Securing supply chains for critical resources and components
-- Political Considerations: Balancing economic pragmatism with nationalistic sentiment
-- Belt and Road Initiative: Expanding economic influence in developing markets
-- Dual Circulation: Developing domestic consumption while maintaining export strength
+CHINESE GOVERNMENT POLICY PRIORITIES (2024-2026 ERA)
+- Technological Self-Sufficiency: Overcoming US export controls in semiconductors, AI, and advanced tech
+- Green Technology Leadership: Dominating global markets for EVs, batteries, and solar panels
+- Strategic Retaliation: Calibrated responses to Western restrictions (rare earths, critical minerals)
+- Dual Circulation: Building domestic consumption while maintaining export competitiveness
+- Regional Integration: Strengthening RCEP and Belt and Road partnerships
+- Industrial Subsidies: Massive state support for strategic industries
+- Supply Chain Security: Reducing dependencies on Western technology and materials
+- Data and Digital Sovereignty: Building independent tech ecosystem (semiconductors, software, cloud)
+- Global South Relations: Positioning as alternative to Western-led trade order
+- Selective Market Access: Using Chinese market as leverage in negotiations
 """
     
     # Previous policy continuity
@@ -74,9 +76,9 @@ INSTRUCTIONS:
 Recommend ONE specific trade policy action China should take this quarter.
 Your response should be structured as follows:
 
-ACTION: [tariff_increase, tariff_decrease, investment, export_subsidy, currency_devaluation, status_quo]
+ACTION: [tariff_increase, tariff_decrease, investment, export_subsidy, currency_devaluation, tech_export_control, industrial_subsidy, supply_chain_diversification, green_tech_investment, status_quo]
 TARGET_COUNTRY: [country name, or "none" if not targeting a specific country]
-SECTORS: [comma-separated list of affected economic sectors]
+SECTORS: [comma-separated list of affected economic sectors - can include: semiconductors, ai, green_tech, batteries, rare_earths, etc.]
 MAGNITUDE: [numerical percentage between 0-100]
 JUSTIFICATION: [2-3 sentence explanation aligned with Chinese policy priorities]
 EXPECTED_OUTCOMES: [brief description of expected results]

@@ -30,18 +30,19 @@ def generate_indonesia_policy_prompt(
     economic_context = create_economic_context(state, country)
     country_context = create_country_context(country)
     
-    # Indonesia-specific additions
+    # Indonesia-specific additions - updated for 2024-2026 era
     indonesia_policy_focus = """
-INDONESIAN GOVERNMENT POLICY PRIORITIES
-- Economic Development: Focus on sustained economic growth and poverty reduction
-- Resource Nationalism: Protecting natural resource industries and increasing value added
-- Balancing Great Powers: Navigating US-China tensions while maintaining relations with both
-- ASEAN Integration: Strengthening regional economic ties within Southeast Asia
-- Domestic Industry Protection: Selective protectionism for strategic industries
-- Foreign Investment: Attracting investment while maintaining economic sovereignty
-- Palm Oil Exports: Protecting access to markets for key agricultural exports
-- Infrastructure Development: Building necessary infrastructure for economic growth
-- Tourism Development: Growing the tourism sector as a source of foreign exchange
+INDONESIAN GOVERNMENT POLICY PRIORITIES (2024-2026 ERA)
+- Strategic Neutrality: Benefiting from US-China competition without taking sides
+- Nearshoring Beneficiary: Attracting manufacturing relocating from China (electronics, textiles)
+- Critical Minerals Hub: Leveraging nickel, cobalt, and rare earth resources for EV batteries
+- Green Economy Transition: Positioning as a green technology manufacturing hub
+- ASEAN Leadership: Strengthening regional trade agreements (RCEP, CPTPP consideration)
+- Resource Value Addition: Moving up value chain in commodities (processed nickel, refined minerals)
+- Digital Economy Growth: Developing tech sector and digital infrastructure
+- Climate-Resilient Development: Balancing growth with environmental sustainability
+- Infrastructure Investment: Building capacity to compete for global supply chains
+- Selective Industrial Policy: Supporting strategic sectors (EVs, batteries, electronics)
 """
     
     # Previous policy continuity
@@ -80,9 +81,9 @@ INSTRUCTIONS:
 Recommend ONE specific trade policy action Indonesia should take this quarter.
 Your response should be structured as follows:
 
-ACTION: [tariff_increase, tariff_decrease, investment, export_subsidy, import_quota, status_quo]
+ACTION: [tariff_increase, tariff_decrease, investment, export_subsidy, import_quota, industrial_subsidy, supply_chain_diversification, green_tech_investment, friend_shoring, status_quo]
 TARGET_COUNTRY: [country name, or "none" if not targeting a specific country]
-SECTORS: [comma-separated list of affected economic sectors]
+SECTORS: [comma-separated list of affected economic sectors - can include: batteries, rare_earths, green_tech, electronics, etc.]
 MAGNITUDE: [numerical percentage between 0-100]
 JUSTIFICATION: [2-3 sentence explanation aligned with Indonesian policy priorities]
 EXPECTED_OUTCOMES: [brief description of expected results]

@@ -15,7 +15,7 @@ def generate_us_policy_prompt(
     previous_actions: List[EconomicAction]
 ) -> str:
     """
-    Generate a prompt for US policy decisions with Trump administration focus.
+    Generate a prompt for US policy decisions reflecting current era policies.
     
     Args:
         state: Current simulation state
@@ -30,16 +30,19 @@ def generate_us_policy_prompt(
     economic_context = create_economic_context(state, country)
     country_context = create_country_context(country)
     
-    # US Trump-specific additions
-    trump_policy_focus = """
-TRUMP ADMINISTRATION POLICY PRIORITIES
-- America First: Prioritizing US economic interests above global considerations
-- Trade Deficit Reduction: Particular focus on reducing deficits with China and other major partners
-- Manufacturing Revival: Protecting and growing US manufacturing jobs
-- Aggressive Bargaining: Using tariffs as leverage to negotiate better trade deals
-- Bilateral over Multilateral: Preference for direct country-to-country negotiations
-- Protectionism: Willingness to use tariffs and other measures to protect US industries
-- Less Concern for WTO: Skepticism of multilateral trade institutions and their rules
+    # US policy focus - updated for 2024-2026 era
+    us_policy_focus = """
+US TRADE POLICY PRIORITIES (2024-2026 ERA)
+- Strategic Competition with China: Focus on technology leadership, semiconductors, and AI
+- Industrial Policy: Major subsidies for domestic manufacturing (CHIPS Act, IRA)
+- Supply Chain Resilience: "Friend-shoring" and nearshoring to reduce China dependencies
+- Green Technology Race: Leading in EVs, batteries, solar panels, and clean energy
+- Technology Export Controls: Restricting advanced chip and AI technology exports
+- Allied Cooperation: Working with allies (EU, Japan, South Korea) on coordinated approaches
+- Critical Minerals Security: Ensuring access to rare earths and battery materials
+- Data Sovereignty: Protecting digital infrastructure and limiting foreign tech access
+- Worker-Centered Trade: Focus on labor standards and middle-class benefits
+- Selective Tariffs: Targeted tariffs on strategic sectors rather than broad-based
 """
     
     # Previous policy continuity
@@ -55,9 +58,9 @@ TRUMP ADMINISTRATION POLICY PRIORITIES
     
     # Build the decision prompt
     decision_prompt = f"""
-You are a strategic advisor to the Trump administration on international trade policy.
+You are a strategic advisor to the US government on international trade policy.
 Based on the information provided, recommend a specific trade action that aligns with
-the administration's priorities.
+current US strategic priorities.
 
 {simulation_context}
 
@@ -65,7 +68,7 @@ the administration's priorities.
 
 {country_context}
 
-{trump_policy_focus}
+{us_policy_focus}
 
 {policy_history}
 
@@ -73,11 +76,11 @@ INSTRUCTIONS:
 Recommend ONE specific trade policy action the US should take this quarter.
 Your response should be structured as follows:
 
-ACTION: [tariff_increase, tariff_decrease, investment, export_subsidy, status_quo]
+ACTION: [tariff_increase, tariff_decrease, investment, export_subsidy, tech_export_control, industrial_subsidy, supply_chain_diversification, green_tech_investment, friend_shoring, status_quo]
 TARGET_COUNTRY: [country name, or "none" if not targeting a specific country]
-SECTORS: [comma-separated list of affected economic sectors]
+SECTORS: [comma-separated list of affected economic sectors - can include: semiconductors, ai, green_tech, batteries, automotive, etc.]
 MAGNITUDE: [numerical percentage between 0-100]
-JUSTIFICATION: [2-3 sentence explanation aligned with Trump's policy priorities]
+JUSTIFICATION: [2-3 sentence explanation aligned with current US policy priorities]
 EXPECTED_OUTCOMES: [brief description of expected results]
 """
     

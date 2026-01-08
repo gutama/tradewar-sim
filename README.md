@@ -1,6 +1,6 @@
 # Trade War Simulation
 
-A sophisticated simulation framework for modeling trade wars between countries, with a specific focus on the dynamics between the US, China, and Indonesia.
+A sophisticated simulation framework for modeling trade wars between countries, with a specific focus on the dynamics between the US, China, and Indonesia. **Now updated with 2024-2026 trade war developments including technology export controls, green tech competition, and supply chain restructuring.**
 
 ## Overview
 
@@ -14,6 +14,10 @@ This project simulates the economic impacts of trade policies, tariffs, and reta
 - LLM-powered decision making to simulate realistic policy responses
 - Interactive dashboard for visualization and analysis
 - API for programmatic control and data retrieval
+- **NEW: Modern trade dynamics** including tech export controls, industrial subsidies, supply chain diversification
+- **NEW: Green technology competition** with EVs, batteries, and renewable energy
+- **NEW: Enhanced events** reflecting semiconductors, AI, cyber attacks, and nearshoring trends
+- **NEW: Updated policy frameworks** reflecting 2024-2026 US-China strategic competition
 
 ## Installation
 
@@ -77,6 +81,15 @@ Run tests:
 ```bash
 pytest
 ```
+
+## What's New in 2024-2026 Update
+
+See [TRADE_WAR_2024_UPDATES.md](TRADE_WAR_2024_UPDATES.md) for detailed information on the latest enhancements, including:
+
+- **6 new action types**: tech export controls, industrial subsidies, supply chain diversification, green tech investment, friend-shoring, and data sovereignty
+- **8 new event types**: semiconductor shortages, AI breakthroughs, EV market disruptions, rare earth crises, cyber attacks, green tech subsidy races, regional trade agreements, and nearshoring waves
+- **Updated policy frameworks**: Reflecting current US (Biden-era), China, and Indonesia strategic priorities
+- **Modern sectors**: Semiconductors, AI, green tech, batteries, rare earths, and more
 
 ## License
 
