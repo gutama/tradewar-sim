@@ -1,4 +1,13 @@
-"""US-specific prompt additions focused on Trump administration policies."""
+"""US-specific prompt additions for trade policy decisions (2024-2026 era).
+
+This module generates prompts for US trade policy reflecting current strategic
+priorities including technology competition with China, industrial policy,
+supply chain resilience, and green technology leadership.
+
+Note: The filename 'us_trump_policy' is retained for backward compatibility,
+but the implementation now reflects broader US trade policy beyond any single
+administration, covering the 2024-2026 era strategic priorities.
+"""
 
 from typing import List
 
@@ -15,7 +24,7 @@ def generate_us_policy_prompt(
     previous_actions: List[EconomicAction]
 ) -> str:
     """
-    Generate a prompt for US policy decisions reflecting current era policies.
+    Generate a prompt for US policy decisions reflecting current era (2024-2026) policies.
     
     Args:
         state: Current simulation state
