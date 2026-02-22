@@ -16,7 +16,7 @@ This document describes the enhancements made to the Trade War Simulation framew
 
 **Implementation:**
 - New action types: `tech_export_control`, `industrial_subsidy`
-- Updated US policy prompts to reflect Biden-era priorities
+- Updated US policy prompts to reflect Trump 2.0 era priorities (aggressive tariffs, tech decoupling, re-industrialisation)
 - New events: AI breakthroughs, semiconductor shortages
 
 ### 2. Green Technology Race
@@ -64,18 +64,41 @@ This document describes the enhancements made to the Trade War Simulation framew
 - New events: Regional trade agreement formation
 - Updated policy priorities for all countries
 
+### 6. US-Indonesia Reciprocal Trade Agreement (2025-2026)
+
+**Key Changes Incorporated:**
+- Framework and finalization of a bilateral Agreement on Reciprocal Trade
+- Indonesia-side market opening across most U.S. exports (including non-tariff barrier commitments)
+- U.S. reciprocal tariff structure with product-specific carve-outs
+- Emphasis on supply chain resilience and critical minerals cooperation
+
+**Implementation:**
+- Added explicit configuration knobs for reciprocal-trade assumptions in `tradewar/config.py`
+- Added trade diversion logic in `tradewar/economics/trade_balance.py`
+- Diversion now reallocates part of importer demand from higher-tariff suppliers to lower-tariff suppliers
+- US-Indonesia flows receive an additional preference boost from the configured agreement start year
+
 ## New Features
 
-### New Economic Action Types
+### Economic Action Types (Full List)
 
-The simulation now supports these additional action types:
+The simulation supports **11 action types** across two categories:
 
-1. **tech_export_control**: Restrict exports of advanced technology (semiconductors, AI)
-2. **industrial_subsidy**: Government subsidies for domestic manufacturing
-3. **supply_chain_diversification**: Reduce dependency on single country/region
-4. **green_tech_investment**: Investment in clean energy and EV technology
-5. **friend_shoring**: Relocate supply chains to allied countries
-6. **data_sovereignty**: Protect digital infrastructure and data
+#### Traditional Actions
+1. **tariff_increase**: Raise import duties on a target country/sector
+2. **tariff_decrease**: Reduce import duties — used as diplomatic concession
+3. **tariff_adjustment**: Fine-grained sector-specific rate changes
+4. **import_quota**: Restrict import volumes; engine applies `quota_factor = max(0, 1 - min(0.9, magnitude))` to matching trade flows
+5. **export_subsidy**: Subsidise domestic exports to improve competitiveness
+6. **currency_devaluation**: Depreciate currency to boost exports and compress imports
+
+#### Modern Actions (2024-2026)
+7. **tech_export_control**: Restrict exports of advanced technology (semiconductors, AI chips)
+8. **industrial_subsidy**: Government subsidies for strategic domestic manufacturing
+9. **supply_chain_diversification**: Reduce single-country supply chain dependencies
+10. **green_tech_investment**: Investment in clean energy, EVs, and battery technology
+11. **friend_shoring**: Relocate supply chains to allied countries
+12. **data_sovereignty**: Protect national digital infrastructure and data flows
 
 ### New Economic Sectors
 
@@ -114,16 +137,15 @@ The following sectors are now recognized in the simulation:
 
 ### Updated Policy Prompts
 
-#### United States (2024-2026 Era)
+#### United States (Trump 2.0 Era, 2025-2026)
 Focus areas:
-- Strategic competition with China in technology
-- Industrial policy and domestic manufacturing subsidies
-- Supply chain resilience through friend-shoring
-- Green technology leadership
-- Technology export controls
-- Allied cooperation
-- Critical minerals security
-- Data sovereignty
+- Aggressive tariffs as primary trade lever (reciprocal tariff doctrine)
+- Technology decoupling from China (semiconductors, AI, advanced manufacturing)
+- Re-industrialisation through domestic manufacturing subsidies
+- Supply chain resilience through friend-shoring and near-shoring
+- Technology export controls under CHIPS Act framework
+- Critical minerals security and allied cooperation
+- Data sovereignty and digital infrastructure protection
 
 #### China (2024-2026 Era)
 Focus areas:
@@ -154,8 +176,8 @@ Focus areas:
 ```python
 from tradewar.economics.models import Country, EconomicAction, ActionType
 
-us = Country(name="US", gdp=25.0)
-china = Country(name="China", gdp=17.0)
+us = Country(name="US", gdp=28.8)
+china = Country(name="China", gdp=17.8)
 
 action = EconomicAction(
     country=us,
@@ -170,6 +192,8 @@ action = EconomicAction(
 ### Example 2: Green Technology Investment
 
 ```python
+china = Country(name="China", gdp=17.8)
+
 action = EconomicAction(
     country=china,
     action_type=ActionType.GREEN_TECH_INVESTMENT,
@@ -214,19 +238,28 @@ action = EconomicAction(
 - Nearshoring creates new manufacturing hubs
 - Critical mineral suppliers gain leverage
 
+### 5. Trade Diversion under Reciprocal Tariff Regimes
+- Bilateral tariff gaps now trigger third-country trade reallocation
+- Diversion intensity and caps are configurable
+- Simulations can represent import substitution away from penalized partners
+
 ## Testing
 
-Run the test suite to verify new features:
+Run the test suite to verify all features:
 
 ```bash
-pytest tests/ -v
+pytest tests/ -q
+# Expected: 62 passed, 0 failures
 ```
 
 Key test areas:
-- New action types are recognized
-- Events with new sectors work correctly
-- Policy prompts include new action types
-- Economic calculations handle new mechanics
+- All 11 action types are recognised and handled
+- `IMPORT_QUOTA` applies correct `quota_factor` to trade flows
+- Events with modern sectors work correctly
+- Policy prompts include all modern action types
+- Economic indicators (GDP growth, unemployment, inflation, confidence) computed from real formulas
+- API lifecycle round-trips: start → step → state → results
+- Edge cases: zero-GDP country, empty country list, negative tariff rates, missing sectors
 
 ## Future Enhancements
 

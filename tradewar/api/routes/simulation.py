@@ -49,6 +49,8 @@ async def start_simulation(
         
         # Create a simulation engine with these countries
         engine = SimulationEngine(countries=countries)
+        engine.max_years = config.years
+        engine.quarters_per_year = config.steps_per_year
         
         # Register in the simulation manager
         simulation_id = sim_manager.register_simulation(engine)
@@ -141,6 +143,28 @@ async def get_simulation_state(
             status_code=500,
             detail=f"Error getting simulation state: {str(e)}"
         )
+
+
+@router.get("/{simulation_id}/status", response_model=Dict)
+async def get_simulation_status(
+    simulation_id: str,
+    sim_manager=Depends(get_simulation_manager)
+):
+    """Get a lightweight status payload for a simulation."""
+    engine = sim_manager.get_simulation(simulation_id)
+    if not engine:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Simulation with ID {simulation_id} not found"
+        )
+
+    return {
+        "simulation_id": simulation_id,
+        "year": engine.state.year,
+        "quarter": engine.state.quarter,
+        "countries": [country.name for country in engine.countries],
+        "history_length": len(engine.history),
+    }
 
 
 @router.get("/{simulation_id}/stability", response_model=Dict)

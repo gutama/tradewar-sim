@@ -47,8 +47,8 @@ dev = [
 "Homepage" = "https://github.com/gutama/tradewar-sim"
 "Bug Tracker" = "https://github.com/gutama/tradewar-sim/issues"
 
-[tool.setuptools]
-packages = ["tradewar"]
+[tool.setuptools.packages.find]
+include = ["tradewar*"]
 
 [tool.black]
 line-length = 88

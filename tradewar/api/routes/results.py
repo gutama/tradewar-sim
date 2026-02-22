@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from tradewar.api.schemas import (EconomicTimeSeriesData, SimulationResult,
                                 TradeFlowData)
 from tradewar.api.server import get_simulation_manager
-from tradewar.economics.models import Country
+
 
 logger = logging.getLogger(__name__)
 
@@ -198,26 +198,29 @@ async def get_policy_actions(
         
         # Apply filters
         if from_year is not None:
-            actions = [action for action in actions if action.year >= from_year]
+            actions = [action for action in actions if action.timestamp.year >= from_year]
         if to_year is not None:
-            actions = [action for action in actions if action.year <= to_year]
+            actions = [action for action in actions if action.timestamp.year <= to_year]
         if country is not None:
             actions = [action for action in actions if action.country.name == country]
         if action_type is not None:
-            actions = [action for action in actions if action.action_type == action_type]
+            actions = [
+                action for action in actions
+                if getattr(action.action_type, "value", str(action.action_type)) == action_type
+            ]
         
         # Convert to API format
         api_actions = []
         for action in actions:
             api_action = {
                 "country": action.country.name,
-                "action_type": action.action_type,
+                "action_type": getattr(action.action_type, "value", str(action.action_type)),
                 "target_country": action.target_country.name if action.target_country else None,
                 "sectors": action.sectors,
                 "magnitude": action.magnitude,
                 "justification": action.justification,
-                "year": action.year,
-                "quarter": action.quarter
+                "year": action.timestamp.year,
+                "quarter": max(1, ((action.timestamp.month - 1) // 3) + 1)
             }
             api_actions.append(api_action)
         

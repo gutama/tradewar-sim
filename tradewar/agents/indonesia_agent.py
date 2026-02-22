@@ -3,8 +3,9 @@
 from typing import Dict, List, Optional
 
 from tradewar.agents.base_agent import BaseAgent
-from tradewar.economics.models import Country, EconomicAction, TariffPolicy
+from tradewar.economics.models import ActionType, Country, EconomicAction, TariffPolicy
 from tradewar.llm.client import LLMClient
+from tradewar.llm.parser import LLMResponseParser
 from tradewar.llm.prompts.indonesia_policy import generate_indonesia_policy_prompt
 from tradewar.simulation.state import SimulationState
 
@@ -38,6 +39,7 @@ class IndonesiaAgent(BaseAgent):
         self.priority_sectors = strategy_params.get(
             "priority_sectors", ["agriculture", "manufacturing", "tourism", "natural_resources"]
         )
+        self.response_parser = LLMResponseParser()
         
     def decide_action(self, state: SimulationState) -> EconomicAction:
         """
@@ -63,18 +65,35 @@ class IndonesiaAgent(BaseAgent):
         if self.llm_client:
             prompt = generate_indonesia_policy_prompt(state, self.country, self.previous_actions)
             llm_response = self.llm_client.generate_response(prompt)
+            if llm_response.startswith("ERROR:"):
+                return self._decide_without_llm(state)
             action = self._parse_llm_response(llm_response, state)
+            if action is None:
+                return self._decide_without_llm(state)
             return action
-        
-        # Default rule-based behavior if no LLM
+
+        return self._decide_without_llm(state)
+
+    def _decide_without_llm(self, state: SimulationState) -> EconomicAction:
+        """Rule-based fallback behavior when LLM is unavailable."""
+        # Check what US and China are doing
+        us_actions = [
+            action for action in state.recent_actions
+            if action.country.name == "US" and action.target_country
+        ]
+        china_actions = [
+            action for action in state.recent_actions
+            if action.country.name == "China" and action.target_country
+        ]
+
         # Observe US-China trade tensions and try to benefit
         if us_actions and china_actions:
             if us_actions[-1].target_country.name == "China" and china_actions[-1].target_country.name == "US":
                 # US and China are in conflict - opportunity for Indonesia
                 return EconomicAction(
                     country=self.country,
-                    action_type="investment",
-                    target_country=None,
+                    action_type=ActionType.SUPPLY_CHAIN_DIVERSIFICATION,
+                    target_country=Country(name="US"),
                     sectors=self.priority_sectors[:2],  # Focus on top priority sectors
                     magnitude=0.15,  # 15% investment increase
                     justification="Leveraging US-China trade tensions to boost domestic industries"
@@ -85,7 +104,7 @@ class IndonesiaAgent(BaseAgent):
         if indicators and indicators[-1].gdp_growth < 0.015:  # Growth below 1.5%
             return EconomicAction(
                 country=self.country,
-                action_type="tariff_increase",
+                action_type=ActionType.TARIFF_INCREASE,
                 target_country=None,  # Apply to all trading partners
                 sectors=self.priority_sectors,
                 magnitude=0.1 * self.protectionist_tendency,  # 5-10% tariffs depending on tendency
@@ -95,7 +114,7 @@ class IndonesiaAgent(BaseAgent):
         # Default: Focus on economic development through investment
         return EconomicAction(
             country=self.country,
-            action_type="investment",
+            action_type=ActionType.GREEN_TECH_INVESTMENT,
             target_country=None,
             sectors=self.priority_sectors,
             magnitude=0.08,  # 8% investment increase
@@ -146,14 +165,6 @@ class IndonesiaAgent(BaseAgent):
             duration_quarters=4  # 1 year
         )
     
-    def _parse_llm_response(self, llm_response: str, state: SimulationState) -> EconomicAction:
+    def _parse_llm_response(self, llm_response: str, state: SimulationState) -> Optional[EconomicAction]:
         """Parse LLM response into an economic action."""
-        # Simplified placeholder implementation
-        return EconomicAction(
-            country=self.country,
-            action_type="tariff_adjustment",
-            target_country=None,  # Apply generally
-            sectors=self.priority_sectors,
-            magnitude=0.1,
-            justification="LLM-generated policy decision"
-        )
+        return self.response_parser.parse_action_response(llm_response, self.country, state)

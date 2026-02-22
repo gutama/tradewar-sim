@@ -2,7 +2,7 @@
 
 from typing import Dict, List, Optional
 
-from tradewar.economics.models import Country, EconomicAction
+from tradewar.economics.models import Country, EconomicAction, EventConfig
 from tradewar.simulation.state import SimulationState
 
 
@@ -103,7 +103,7 @@ def create_country_context(country: Country) -> str:
     # Country-specific descriptions
     descriptions = {
         "US": """
-The United States is the world's largest economy with significant influence in global trade.
+The United States (US) is the world's largest economy with significant influence in global trade.
 Key economic characteristics:
 - Strong focus on services, technology, and advanced manufacturing
 - Major exports: machinery, electronics, aircraft, vehicles, pharmaceuticals
@@ -154,12 +154,13 @@ def _format_recent_actions(actions: List[EconomicAction]) -> str:
     for action in actions[-5:]:  # Show only the 5 most recent actions
         target = f" against {action.target_country.name}" if action.target_country else ""
         sectors = f" in {', '.join(action.sectors)}" if action.sectors else ""
-        result += f"- {action.country.name} implemented {action.action_type}{target}{sectors} "
+        action_type = getattr(action.action_type, "value", str(action.action_type))
+        result += f"- {action.country.name} implemented {action_type}{target}{sectors} "
         result += f"({action.magnitude:.1%} magnitude). Justification: {action.justification}\n"
     return result
 
 
-def _format_events(events: List[dict]) -> str:
+def _format_events(events: List[EventConfig]) -> str:
     """Format a list of active events."""
     if not events:
         return "No significant events."

@@ -77,7 +77,7 @@ class EventGenerator:
                 continue
             
             # Check if this event should trigger on this exact time
-            if hasattr(event, "trigger_time") and event.trigger_time == timeline_pos:
+            if event.trigger_time is not None and event.trigger_time == timeline_pos:
                 events.append(event)
                 
                 # Mark as triggered to avoid repeats
@@ -94,11 +94,11 @@ class EventGenerator:
         # Sample from predefined events with their probabilities
         for event in self.predefined_events:
             # Skip events that are specifically scheduled
-            if hasattr(event, "trigger_time"):
+            if event.trigger_time is not None:
                 continue
             
             # Skip already triggered one-time events
-            if event.name in self.triggered_events and hasattr(event, "one_time") and event.one_time:
+            if event.name in self.triggered_events and event.one_time:
                 continue
             
             # Roll the dice to see if this event occurs
@@ -106,7 +106,7 @@ class EventGenerator:
                 events.append(event)
                 
                 # If it's a one-time event, mark as triggered
-                if hasattr(event, "one_time") and event.one_time:
+                if event.one_time:
                     self.triggered_events.add(event.name)
         
         return events
@@ -161,11 +161,10 @@ class EventGenerator:
                 "Indonesia": 0.0,  # Neutral immediate effect
             },
             duration_quarters=1,
-            description="US Presidential election causing policy uncertainty"
+            description="US Presidential election causing policy uncertainty",
+            trigger_time=2 * 4 + 3,
+            one_time=True,
         )
-        # Add a specific trigger time (year 2, quarter 3)
-        setattr(election_event, "trigger_time", 2 * 4 + 3)
-        setattr(election_event, "one_time", True)
         events.append(election_event)
         
         # China credit crunch
@@ -262,9 +261,9 @@ class EventGenerator:
                 "Indonesia": -0.035, # -3.5% GDP growth
             },
             duration_quarters=5,
-            description="Global health crisis severely impacting all economies"
+            description="Global health crisis severely impacting all economies",
+            one_time=True,
         )
-        setattr(pandemic_event, "one_time", True)
         events.append(pandemic_event)
         
         # Semiconductor shortage

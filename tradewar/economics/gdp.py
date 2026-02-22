@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 
-from tradewar.economics.models import Country, EconomicAction, EventConfig, TariffPolicy
+from tradewar.economics.models import ActionType, Country, EconomicAction, EventConfig, TariffPolicy
 
 # Use TYPE_CHECKING for circular imports
 if TYPE_CHECKING:
@@ -210,28 +210,43 @@ def _calculate_trade_gdp_impact(state: "SimulationState", country: Country) -> f
 
 def _calculate_investment_gdp_impact(state: "SimulationState", country: Country) -> float:
     """
-    Calculate GDP impact from investment policy actions.
-    
+    Calculate GDP impact from investment and subsidy policy actions.
+
+    Covers: INDUSTRIAL_SUBSIDY, GREEN_TECH_INVESTMENT, FRIEND_SHORING,
+    SUPPLY_CHAIN_DIVERSIFICATION, and the legacy INVESTMENT action type.
+
     Args:
         state: Current simulation state
         country: The country
-        
+
     Returns:
         GDP growth impact from investment policies
     """
-    # Look for investment actions in the recent period
-    investment_actions = [
-        action for action in state.recent_actions
-        if action.country.name == country.name and action.action_type == "investment"
-    ]
-    
+    INVESTMENT_TYPES = {
+        ActionType.INDUSTRIAL_SUBSIDY,
+        ActionType.GREEN_TECH_INVESTMENT,
+        ActionType.FRIEND_SHORING,
+        ActionType.SUPPLY_CHAIN_DIVERSIFICATION,
+        ActionType.INVESTMENT,  # legacy
+    }
+
     impact = 0.0
-    
-    for action in investment_actions:
-        # Investment has a multiplier effect on GDP
-        # Magnitude is the percentage of GDP being invested
-        impact += action.magnitude * 1.5  # Multiplier of 1.5
-    
+    for action in state.recent_actions:
+        if action.country.name != country.name:
+            continue
+        if action.action_type not in INVESTMENT_TYPES:
+            continue
+        # Multipliers differ by action type
+        if action.action_type == ActionType.GREEN_TECH_INVESTMENT:
+            multiplier = 1.8  # Higher long-run returns for green investment
+        elif action.action_type == ActionType.INDUSTRIAL_SUBSIDY:
+            multiplier = 1.4
+        elif action.action_type in (ActionType.FRIEND_SHORING, ActionType.SUPPLY_CHAIN_DIVERSIFICATION):
+            multiplier = 0.8  # Modest near-term benefit; mainly resilience
+        else:
+            multiplier = 1.5  # default
+        impact += action.magnitude * multiplier * 0.005  # scale to quarterly GDP fraction
+
     return impact
 
 

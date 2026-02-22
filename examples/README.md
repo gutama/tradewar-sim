@@ -36,9 +36,10 @@ Use the examples as templates to create custom scenarios:
 ```python
 from tradewar.economics.models import ActionType, Country, EconomicAction
 
-# Create countries
-us = Country(name="US", gdp=25.0, population=335000000)
-china = Country(name="China", gdp=17.0, population=1400000000)
+# Create countries with 2024 baseline GDPs (trillions USD)
+us = Country(name="US", gdp=28.8, population=335_000_000)
+china = Country(name="China", gdp=17.8, population=1_400_000_000)
+indonesia = Country(name="Indonesia", gdp=1.42, population=275_000_000)
 
 # Create an action
 action = EconomicAction(
@@ -56,11 +57,23 @@ state.add_action(action)
 
 ## Available Action Types
 
-See `TRADE_WAR_2024_UPDATES.md` for full documentation of:
-- Traditional trade actions (tariffs, subsidies, quotas)
-- Modern actions (tech export controls, green tech investment, friend-shoring)
-- All available sectors (semiconductors, AI, batteries, rare earths, etc.)
-- Event types that can occur during simulation
+All action types are strongly typed via the `ActionType` enum. See `TRADE_WAR_2024_UPDATES.md` for full documentation.
+
+**Traditional actions:**
+- `tariff_increase`, `tariff_decrease`, `tariff_adjustment`
+- `import_quota` — applies a volume quota factor to import flows
+- `export_subsidy`
+- `currency_devaluation`
+
+**Modern actions (2024-2026):**
+- `tech_export_control` — restrict advanced technology exports
+- `industrial_subsidy` — government manufacturing subsidies
+- `supply_chain_diversification` — reduce single-country dependencies
+- `green_tech_investment` — clean energy and EV investment
+- `friend_shoring` — allied-country supply chain relocation
+- `data_sovereignty` — digital infrastructure protection
+
+**Available sectors:** `semiconductors`, `ai`, `green_tech`, `batteries`, `rare_earths`, `automotive`, `mining`, `digital_services`, `electronics`, `manufacturing`, and legacy sectors.
 
 ## Further Documentation
 

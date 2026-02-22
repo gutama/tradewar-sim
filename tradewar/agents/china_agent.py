@@ -3,8 +3,9 @@
 from typing import Dict, Optional
 
 from tradewar.agents.base_agent import BaseAgent
-from tradewar.economics.models import Country, EconomicAction, TariffPolicy
+from tradewar.economics.models import ActionType, Country, EconomicAction, TariffPolicy
 from tradewar.llm.client import LLMClient
+from tradewar.llm.parser import LLMResponseParser
 from tradewar.llm.prompts.china_policy import generate_china_policy_prompt
 from tradewar.simulation.state import SimulationState
 
@@ -38,6 +39,7 @@ class ChinaAgent(BaseAgent):
         self.strategic_sectors = strategy_params.get(
             "strategic_sectors", ["technology", "manufacturing", "rare_earth_minerals"]
         )
+        self.response_parser = LLMResponseParser()
         
     def decide_action(self, state: SimulationState) -> EconomicAction:
         """
@@ -60,16 +62,28 @@ class ChinaAgent(BaseAgent):
         if self.llm_client:
             prompt = generate_china_policy_prompt(state, self.country, self.previous_actions)
             llm_response = self.llm_client.generate_response(prompt)
+            if llm_response.startswith("ERROR:"):
+                return self._decide_without_llm(state)
             action = self._parse_llm_response(llm_response, state)
+            if action is None:
+                return self._decide_without_llm(state)
             return action
-        
-        # Default rule-based behavior if no LLM
-        if us_actions and us_actions[-1].action_type == "tariff_increase":
+
+        return self._decide_without_llm(state)
+
+    def _decide_without_llm(self, state: SimulationState) -> EconomicAction:
+        """Rule-based fallback behavior when LLM is unavailable."""
+        us_actions = [
+            action for action in state.recent_actions
+            if action.country.name == "US" and action.target_country and action.target_country.name == "China"
+        ]
+
+        if us_actions and us_actions[-1].action_type in {ActionType.TARIFF_INCREASE, ActionType.TECH_EXPORT_CONTROL}:
             # Retaliate proportionally to US tariff increases
             us_action = us_actions[-1]
             return EconomicAction(
                 country=self.country,
-                action_type="tariff_increase",
+                action_type=ActionType.INDUSTRIAL_SUBSIDY,
                 target_country=Country(name="US"),
                 sectors=us_action.sectors,
                 magnitude=us_action.magnitude * self.retaliatory_factor,
@@ -79,7 +93,7 @@ class ChinaAgent(BaseAgent):
         # If no recent provocations, focus on strategic sectors
         return EconomicAction(
             country=self.country,
-            action_type="investment",
+            action_type=ActionType.GREEN_TECH_INVESTMENT,
             target_country=None,
             sectors=self.strategic_sectors,
             magnitude=0.1,  # 10% investment increase
@@ -130,14 +144,6 @@ class ChinaAgent(BaseAgent):
             duration_quarters=4
         )
     
-    def _parse_llm_response(self, llm_response: str, state: SimulationState) -> EconomicAction:
+    def _parse_llm_response(self, llm_response: str, state: SimulationState) -> Optional[EconomicAction]:
         """Parse LLM response into an economic action."""
-        # Simplified placeholder implementation
-        return EconomicAction(
-            country=self.country,
-            action_type="tariff_adjustment",
-            target_country=Country(name="US"),
-            sectors=self.strategic_sectors,
-            magnitude=0.15,
-            justification="LLM-generated policy decision"
-        )
+        return self.response_parser.parse_action_response(llm_response, self.country, state)

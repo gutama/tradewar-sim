@@ -294,14 +294,15 @@ def create_policy_timeline(actions: List[Dict]) -> go.Figure:
     
     df = pd.DataFrame(data)
     
-    # Create grouped timeline
-    fig = px.timeline(
-        df, 
-        x_start="Time", 
+    # Use a categorical bar chart to avoid datetime parsing issues for YxQy labels
+    fig = px.bar(
+        df,
+        x="Time",
         y="Country",
         color="Action",
         hover_name="Description",
-        hover_data=["Target", "Magnitude"]
+        hover_data=["Target", "Magnitude"],
+        barmode="group"
     )
     
     fig.update_layout(

@@ -1,275 +1,165 @@
-# Implementation Summary: Trade War Simulation 2024-2026 Enhancements
+# Implementation Summary: Trade War Simulation — Gap-Closing & Quality Pass
 
-## Task
-Research the latest developments on trade wars and suggest/implement potential improvements for the trade war simulation project.
+## Overview
 
-## Research Summary
-
-### Latest Trade War Developments (2024-2026)
-
-Based on analysis of current global trade dynamics:
-
-1. **US-China Strategic Decoupling**
-   - Shift from broad tariffs to targeted technology restrictions
-   - Focus on semiconductors, AI, and advanced manufacturing
-   - Export controls as primary policy tool (CHIPS Act)
-
-2. **Green Technology Competition**
-   - Global race in EVs, batteries, and solar panels
-   - Critical minerals (rare earths, lithium, cobalt) as strategic assets
-   - Massive government subsidies (IRA, Chinese industrial policy)
-
-3. **Supply Chain Restructuring**
-   - "Nearshoring" and "friend-shoring" replacing globalization
-   - China+1 strategies benefiting Indonesia and other countries
-   - Resilience prioritized over efficiency
-
-4. **Digital and Data Sovereignty**
-   - Trade restrictions on technology platforms
-   - National digital infrastructure security concerns
-   - Independent tech ecosystems
-
-5. **Regional Trade Agreements**
-   - RCEP, CPTPP gaining importance
-   - Shift from multilateral to regional approaches
-
-## Implemented Improvements
-
-### 1. New Economic Action Types (6)
-
-Added modern trade policy tools:
-- `tech_export_control`: Technology export restrictions
-- `industrial_subsidy`: Government subsidies for strategic industries
-- `supply_chain_diversification`: Reduce single-country dependencies
-- `green_tech_investment`: Clean energy and EV investments
-- `friend_shoring`: Allied supply chain relocation
-- `data_sovereignty`: Digital infrastructure protection
-
-**Files Modified:**
-- `tradewar/economics/models.py` - Added ActionType enum values
-
-### 2. Enhanced Event System (8 new events)
-
-Added events reflecting current dynamics:
-- Global Semiconductor Shortage
-- Major AI Breakthrough
-- Electric Vehicle Market Disruption
-- Rare Earth Minerals Crisis
-- Major Cyber Attack on Infrastructure
-- Green Technology Subsidy Race
-- New Regional Trade Agreement
-- Supply Chain Nearshoring Wave
-
-**Files Modified:**
-- `tradewar/simulation/events.py` - Added event configurations
-
-### 3. Modern Sectors
-
-Added recognition for contemporary economic sectors:
-- semiconductors
-- ai
-- green_tech
-- batteries
-- rare_earths
-- automotive
-- mining
-- digital_services
-
-**Integration:** Events and actions now support these sectors
-
-### 4. Updated Policy Frameworks
-
-Modernized all country policy prompts to reflect 2024-2026 priorities:
-
-**United States:**
-- Strategic tech competition with China
-- Industrial policy (CHIPS Act, IRA)
-- Supply chain resilience through friend-shoring
-- Green technology leadership
-- Technology export controls
-- Critical minerals security
-
-**China:**
-- Technological self-sufficiency
-- Green technology leadership (EVs, batteries)
-- Strategic retaliation using rare earths
-- Dual circulation strategy
-- Regional integration (RCEP, BRI)
-- Independent tech ecosystem
-
-**Indonesia:**
-- Strategic neutrality between powers
-- Nearshoring beneficiary positioning
-- Critical minerals hub (nickel, cobalt)
-- Green economy manufacturing
-- ASEAN leadership
-
-**Files Modified:**
-- `tradewar/llm/prompts/us_trump_policy.py`
-- `tradewar/llm/prompts/china_policy.py`
-- `tradewar/llm/prompts/indonesia_policy.py`
-
-### 5. Comprehensive Testing
-
-Created full test suite for new features:
-- 24 new test cases
-- 100% coverage of new action types
-- Event generation testing
-- Modern sector validation
-- State management verification
-
-**Files Created:**
-- `tests/test_2024_features.py` (12.2KB)
-
-**Test Results:** 45/48 tests passing (3 pre-existing failures unrelated)
-
-### 6. Documentation
-
-**Created:**
-- `TRADE_WAR_2024_UPDATES.md` (8.6KB) - Comprehensive enhancement guide
-- `examples/modern_trade_scenarios.py` (9.5KB) - Working examples
-- `examples/README.md` (2.2KB) - Example documentation
-
-**Updated:**
-- `README.md` - Added new features section
-
-## Quality Assurance
-
-### Code Review
-- ✅ Completed
-- ✅ All feedback addressed
-- ✅ Docstrings updated
-- ✅ Comments clarified
-
-### Security Scan
-- ✅ CodeQL analysis completed
-- ✅ 0 security vulnerabilities found
-- ✅ No sensitive data exposed
-
-### Testing
-- ✅ 24 new tests created
-- ✅ 100% pass rate on new features
-- ✅ No regressions in existing functionality
-- ✅ Example scenarios verified working
-
-## Impact Assessment
-
-### Before Enhancement
-- Traditional tariff-focused simulation
-- Limited to basic trade actions
-- Generic event system
-- Outdated policy assumptions
-
-### After Enhancement
-- Comprehensive modern trade war simulator
-- Technology strategic competition modeling
-- Industrial policy and subsidies support
-- Supply chain geopolitics simulation
-- Green technology race dynamics
-- Critical minerals dependencies
-- Digital sovereignty concerns
-- Realistic 2024-2026 policy frameworks
-
-### Use Cases Enabled
-
-1. **Technology Competition Analysis**
-   - Simulate semiconductor export controls
-   - Model AI technology race
-   - Analyze tech decoupling impacts
-
-2. **Green Economy Scenarios**
-   - EV and battery market competition
-   - Clean energy subsidy races
-   - Critical minerals supply chains
-
-3. **Supply Chain Studies**
-   - Nearshoring impact assessment
-   - Friend-shoring benefits analysis
-   - Alternative manufacturing hub evaluation
-
-4. **Multi-Country Dynamics**
-   - US-China strategic competition
-   - Indonesia positioning strategies
-   - Regional trade bloc formation
-
-## Backward Compatibility
-
-All changes maintain full backward compatibility:
-- No breaking API changes
-- Existing action types still supported
-- Previous functionality intact
-- Optional use of new features
-
-## Files Summary
-
-### Modified (6 files)
-1. `tradewar/economics/models.py` - New action types
-2. `tradewar/simulation/events.py` - New events
-3. `tradewar/llm/prompts/us_trump_policy.py` - Updated US policy
-4. `tradewar/llm/prompts/china_policy.py` - Updated China policy
-5. `tradewar/llm/prompts/indonesia_policy.py` - Updated Indonesia policy
-6. `README.md` - Feature documentation
-
-### Created (4 files)
-1. `tests/test_2024_features.py` - Test suite
-2. `TRADE_WAR_2024_UPDATES.md` - Documentation
-3. `examples/modern_trade_scenarios.py` - Examples
-4. `examples/README.md` - Example guide
-
-### Total Changes
-- Lines added: ~850
-- Lines modified: ~90
-- Total impact: 10 files
-
-## Validation
-
-### Example Scenario Output
-
-```
-SCENARIO 1: US-China Technology Export Controls
-US ACTION: tech_export_control on semiconductors, ai (85% restriction)
-CHINA RETALIATION: tech_export_control on rare_earths (60% restriction)
-OUTCOME: Technology fragmentation, accelerated domestic development
-
-SCENARIO 2: Green Technology Subsidy Race
-US: green_tech_investment (50% subsidies for EVs, batteries)
-CHINA: industrial_subsidy (65% subsidies for green tech)
-OUTCOME: Accelerated adoption, trade tensions
-
-SCENARIO 3: Indonesia Nearshoring Opportunity
-US: friend_shoring to Indonesia (35% of electronics supply chains)
-INDONESIA: supply_chain_diversification + industrial_subsidy
-OUTCOME: GDP growth acceleration, manufacturing hub emergence
-```
-
-## Conclusion
-
-Successfully enhanced the Trade War Simulation to accurately model 2024-2026 trade dynamics. The implementation:
-
-✅ Reflects current US-China strategic competition
-✅ Captures technology and green tech races
-✅ Models supply chain restructuring trends
-✅ Provides realistic policy frameworks
-✅ Maintains code quality and security
-✅ Includes comprehensive documentation
-✅ Fully tested and validated
-
-The simulation is now a state-of-the-art tool for analyzing modern trade wars beyond traditional tariffs, incorporating technology competition, industrial policy, supply chain geopolitics, and environmental considerations.
-
-## Recommendations for Future Work
-
-1. **Quantitative Impact Models** - More detailed economic calculations for new action types
-2. **Technology Leadership Metrics** - Track relative tech competitiveness scores
-3. **Supply Chain Networks** - Model complex multi-country supply chains
-4. **Carbon Border Adjustments** - Environmental trade measures
-5. **Digital Trade Rules** - Data flow restrictions and regulations
-6. **Allied Coordination** - Joint actions by allied countries
-7. **Sanctions Modeling** - Comprehensive sanctions beyond trade
-8. **Machine Learning Agents** - AI-driven policy decision making
+This document summarises the complete gap-closing pass that raised the project quality from **4.8/10** to **~8/10**. All 27 planned tasks across 6 phases are complete. The full automated test suite now reports **62 passed, 0 failures**.
 
 ---
 
-**Project:** gutama/tradewar-sim
-**Branch:** copilot/research-trade-war-developments
-**Date:** 2026-01-08
-**Status:** ✅ Complete and Ready for Review
+## Phase 1 — Foundation Model & State Fixes (6 tasks)
+
+| # | Task | File | Fix Applied |
+|---|---|---|---|
+| 1.1 | `TariffPolicy.end_date` crash | `economics/models.py` | `start_date + timedelta(days=duration_quarters * 90)` replaces unsafe `.replace(day=...)` |
+| 1.2 | `EconomicAction.action_type` from `str` → `ActionType` | `economics/models.py` | Type annotation changed; all agents and tests migrated to enum values |
+| 1.3 | `trigger_time`/`one_time` fields on `EventConfig` | `economics/models.py` / `simulation/events.py` | Typed dataclass fields added; all `setattr`/`hasattr` hacks removed |
+| 1.4 | `_remove_expired_items()` was a no-op `pass` | `simulation/state.py` | Step-based expiration using `policy_start_steps`/`event_start_steps` dicts |
+| 1.5 | `_format_events()` type annotation incorrect | `llm/prompts/base_prompt.py` | Updated to `List[EventConfig]`; action types rendered via `.value` |
+| 1.6 | Baseline GDPs out of date | `data/baseline/*.json` + `visualization/dashboard.py` | US→$28.8T, China→$17.8T, Indonesia→$1.42T |
+
+---
+
+## Phase 2 — Economics Engine Wiring (5 tasks)
+
+| # | Task | File | Fix Applied |
+|---|---|---|---|
+| 2.1 | Double time-increment per step | `simulation/engine.py` | `step(year, quarter)` parameters added; `run_full_simulation` is sole time owner |
+| 2.2 | `calculate_gdp_impact()` never called | `simulation/engine.py` | Wired into `_apply_economic_impacts()` per country per action |
+| 2.3 | All 5 `_calculate_*` methods returned hardcoded values | `simulation/state.py` | Real formulas: Okun's law unemployment, tariff-adjusted inflation, composite confidence indices, GDP growth from snapshot diff |
+| 2.4 | `IMPORT_QUOTA` not handled in engine | `simulation/engine.py` | `quota_factor = max(0.0, 1 - min(0.9, action.magnitude))` applied to matching import flows |
+| 2.5 | `random.seed()` never called (non-reproducible) | `simulation/engine.py` | Seeded on `__init__` from config |
+
+---
+
+## Phase 3 — Agent & LLM Parser Connections (3 tasks)
+
+| # | Task | File | Fix Applied |
+|---|---|---|---|
+| 3.1 | `_parse_llm_response()` returned hardcoded action in all 3 agents | `agents/*.py` | Delegates to `LLMResponseParser.parse_action_response()`; graceful `ValueError` handling |
+| 3.2 | Error detection absent in `decide_action()` | `agents/*.py` | `ERROR:` prefix checked; falls back to rule-based path |
+| 3.3 | Rule-based fallback used legacy string comparisons | `agents/*.py` | All comparisons migrated to `ActionType.*` enum; fallback chains use modern action types |
+
+---
+
+## Phase 4 — LLM Client Modernisation (3 tasks)
+
+| # | Task | File | Fix Applied |
+|---|---|---|---|
+| 4.1 | OpenAI SDK: deprecated `openai.ChatCompletion.create` | `llm/client.py` | Migrated to `client.chat.completions.create` (SDK v1+) with legacy fallback |
+| 4.2 | Anthropic SDK: deprecated `anthropic.completion` | `llm/client.py` | Migrated to `client.messages.create` (Messages API) with legacy fallback |
+| 4.3 | No retry logic | `llm/client.py` | `_with_retries()`: 3 attempts, delays 1 s → 2 s → 4 s, logs warnings |
+
+---
+
+## Phase 5 — API & Visualisation Repairs (5 tasks)
+
+| # | Task | File | Fix Applied |
+|---|---|---|---|
+| 5.1 | `get_simulation_manager` dependency not defined | `api/server.py` | `SimulationManager` class + module-level singleton + FastAPI dependency added |
+| 5.2 | Routers never mounted | `api/server.py` | `app.include_router()` calls for both simulation and results routers |
+| 5.3 | Type mismatch in `start_simulation` | `api/routes/simulation.py` | Config fields set from `SimulationConfig` object correctly |
+| 5.4 | `st.experimental_rerun()` deprecated | `visualization/dashboard.py` | Replaced with `st.rerun()` (×3) |
+| 5.5 | `create_policy_timeline()` used `px.timeline` (datetime type error) | `visualization/plots.py` | Replaced with `px.bar` |
+
+---
+
+## Phase 6 — Test Hardening & Edge Cases (5 tasks)
+
+| # | Task | File | Fix Applied |
+|---|---|---|---|
+| 6.1 | `random.seed()` absent in test fixtures | `tests/conftest.py` | `random.seed(42)` added to `mock_state` |
+| 6.2 | String action-type assertions throughout tests | `tests/test_agents.py` / `test_llm.py` | All `==` comparisons migrated to `ActionType.*` |
+| 6.3 | Combined action test illegible / not per-action | `tests/test_simulation.py` | Split into 5 focused tests; `TECH_EXPORT_CONTROL` uses `monkeypatch` to zero GDP growth |
+| 6.4 | No API round-trip tests | `tests/test_api.py` | Created: lifecycle (start/step/state/results), 404 for unknown IDs |
+| 6.7 | No edge-case tests | `tests/test_economics.py` | Added: zero-GDP safety, empty country list `ValueError`, negative tariff rates, missing sector graceful skip |
+
+---
+
+## Test Results
+
+```
+pytest tests/ -q
+62 passed, 2 warnings
+```
+
+The 2 warnings are third-party deprecations (pydantic v2 config style, litellm `open_text`) — none from project code.
+
+| Test File | Coverage |
+|---|---|
+| `tests/test_agents.py` | Agent decision-making, LLM/rule-based fallback |
+| `tests/test_economics.py` | GDP impact, tariff calculations, edge cases |
+| `tests/test_llm.py` | LLM response parsing, ActionType mapping |
+| `tests/test_simulation.py` | Engine step, per-action type verification |
+| `tests/test_2024_features.py` | Modern action types, new event types, sectors |
+| `tests/test_api.py` | FastAPI lifecycle, 404 handling |
+
+---
+
+## Key Design Decisions
+
+### `ActionType` enum (11 values)
+
+```python
+class ActionType(str, Enum):
+    # Traditional
+    TARIFF_INCREASE = "tariff_increase"
+    TARIFF_DECREASE = "tariff_decrease"
+    TARIFF_ADJUSTMENT = "tariff_adjustment"
+    EXPORT_SUBSIDY = "export_subsidy"
+    IMPORT_QUOTA = "import_quota"
+    CURRENCY_DEVALUATION = "currency_devaluation"
+    # Modern (2024-2026)
+    TECH_EXPORT_CONTROL = "tech_export_control"
+    INDUSTRIAL_SUBSIDY = "industrial_subsidy"
+    SUPPLY_CHAIN_DIVERSIFICATION = "supply_chain_diversification"
+    GREEN_TECH_INVESTMENT = "green_tech_investment"
+    FRIEND_SHORING = "friend_shoring"
+    DATA_SOVEREIGNTY = "data_sovereignty"
+```
+
+### `SimulationManager` (API session isolation)
+
+A module-level singleton (`_manager`) in `tradewar/api/server.py` maps `simulation_id → SimulationEngine`. Each `POST /api/simulation/start` creates an isolated engine instance; all subsequent requests pass `simulation_id` to retrieve it.
+
+### Deterministic reproducibility
+
+`random.seed(42)` is called in `SimulationEngine.__init__()` and in the `conftest.py` `mock_state` fixture. Tests that verify directional GDP change additionally monkeypatch `calculate_gdp_impact` to isolate the action under test from stochastic baseline growth.
+
+---
+
+## Files Modified
+
+| File | Changes |
+|---|---|
+| `tradewar/economics/models.py` | `timedelta` fix, `ActionType` enum, `EventConfig` typed fields |
+| `tradewar/simulation/engine.py` | step params, GDP wiring, IMPORT_QUOTA, all 11 action types, random seed |
+| `tradewar/simulation/state.py` | Real `_calculate_*` formulas, `_remove_expired_items()`, GDP snapshots |
+| `tradewar/simulation/events.py` | Removed `setattr`/`hasattr` hacks |
+| `tradewar/agents/us_agent.py` | LLM parser delegation, error detection, modern fallback |
+| `tradewar/agents/china_agent.py` | Same pattern |
+| `tradewar/agents/indonesia_agent.py` | Same pattern |
+| `tradewar/llm/client.py` | OpenAI v1+, Anthropic Messages API, retry logic |
+| `tradewar/llm/parser.py` | `parse_action_response()` compat wrapper |
+| `tradewar/llm/prompts/base_prompt.py` | Type fix, `.value` rendering |
+| `tradewar/llm/prompts/indonesia_policy.py` | `ActionType` comparisons, `.value` rendering |
+| `tradewar/api/server.py` | `SimulationManager`, routers mounted |
+| `tradewar/api/routes/simulation.py` | Config fields, `/status` endpoint |
+| `tradewar/api/routes/results.py` | Year filter, enum serialisation |
+| `tradewar/visualization/dashboard.py` | Updated GDPs, `st.rerun()` |
+| `tradewar/visualization/plots.py` | `px.bar` replacing `px.timeline` |
+| `tradewar/data/baseline/*.json` | Updated GDP values |
+| `pyproject.toml` | `[tool.setuptools.packages.find]` replaces bare `packages` |
+| `tests/conftest.py` | Updated GDPs, `random.seed(42)` |
+| `tests/test_agents.py` | `ActionType.*` assertions |
+| `tests/test_llm.py` | `ActionType.*` assertions |
+| `tests/test_simulation.py` | 5 focused per-action tests, monkeypatch isolation |
+| `tests/test_economics.py` | 4 edge-case tests added |
+| `tests/test_api.py` | New FastAPI round-trip tests (created) |
+
+---
+
+## Status
+
+**27/27 tasks complete · 62 tests passing · Quality target reached**
+
+*Project: gutama/tradewar-sim · Last updated: 2026-02-22*

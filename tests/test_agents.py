@@ -7,7 +7,7 @@ from tradewar.agents.china_agent import ChinaAgent
 from tradewar.agents.factory import AgentFactory
 from tradewar.agents.indonesia_agent import IndonesiaAgent
 from tradewar.agents.us_agent import USAgent
-from tradewar.economics.models import Country, EconomicAction, TariffPolicy
+from tradewar.economics.models import ActionType, Country, EconomicAction, TariffPolicy
 from tradewar.simulation.state import SimulationState
 
 
@@ -43,7 +43,12 @@ def test_us_agent_decides_action(mock_state):
     # Assert
     assert isinstance(action, EconomicAction)
     assert action.country.name == "US"
-    assert action.action_type in ["tariff_increase", "tariff_adjustment", "status_quo"]
+    assert action.action_type in [
+        ActionType.TARIFF_INCREASE,
+        ActionType.TECH_EXPORT_CONTROL,
+        ActionType.FRIEND_SHORING,
+        ActionType.STATUS_QUO,
+    ]
 
 
 def test_china_agent_tariff_policy(mock_state):
@@ -83,7 +88,12 @@ def test_indonesia_agent_decides_action(mock_state):
     # Assert
     assert isinstance(action, EconomicAction)
     assert action.country.name == "Indonesia"
-    assert action.action_type in ["tariff_increase", "investment", "tariff_adjustment", "status_quo"]
+    assert action.action_type in [
+        ActionType.TARIFF_INCREASE,
+        ActionType.SUPPLY_CHAIN_DIVERSIFICATION,
+        ActionType.GREEN_TECH_INVESTMENT,
+        ActionType.STATUS_QUO,
+    ]
 
 
 def test_agent_records_actions(mock_state):

@@ -1,7 +1,7 @@
 """Economic models and data structures for the trade war simulation."""
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import Dict, List, Optional, Set
 
@@ -56,7 +56,7 @@ class EconomicAction:
     """Represents an economic action taken by a country."""
     
     country: Country
-    action_type: str
+    action_type: ActionType
     sectors: List[str]
     magnitude: float
     justification: str
@@ -80,9 +80,7 @@ class TariffPolicy:
         """Calculate the end date based on duration."""
         # Rough approximation: 1 quarter = 90 days
         days = self.duration_quarters * 90
-        return self.start_date.replace(
-            day=self.start_date.day + days
-        )
+        return self.start_date + timedelta(days=days)
 
 
 @dataclass
@@ -129,3 +127,5 @@ class EventConfig:
     gdp_impact: Dict[str, float]
     duration_quarters: int
     description: str
+    trigger_time: Optional[int] = None
+    one_time: bool = False

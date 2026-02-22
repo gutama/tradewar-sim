@@ -34,7 +34,7 @@ The `SimulationEngine` orchestrates the entire simulation:
 
 ```python
 # Main simulation loop
-def step(self) -> SimulationState:
+def step(self, year: int, quarter: int) -> SimulationState:
     # Get actions from all country agents
     actions = [agent.decide_action(self.state) for agent in self.agents.values()]
     
@@ -47,12 +47,6 @@ def step(self) -> SimulationState:
     # Check for and apply any external events
     self._handle_events()
     
-    # Advance time
-    self.current_quarter += 1
-    if self.current_quarter > 4:
-        self.current_quarter = 1
-        self.current_year += 1
-        
     # Update agent strategies
     for agent in self.agents.values():
         agent.update_strategy(self.state)
@@ -69,30 +63,36 @@ Each country is represented by a specialized agent that determines trade policy 
 - **IndonesiaAgent**: Models Indonesia's policy, balancing relations with both powers
 
 Each agent can:
-1. Decide economic actions (tariffs, subsidies, etc.)
-2. Calculate tariff policies
-3. Update their strategy based on evolving conditions
+1. Decide economic actions using **LLM-powered reasoning** or a deterministic **rule-based fallback**
+2. Parse LLM responses into typed `EconomicAction` objects via `LLMResponseParser`
+3. Calculate and apply tariff policies
+4. Update their strategy based on evolving conditions
+
+All action types are strongly typed via the `ActionType` enum (11 values):
+- Traditional: `TARIFF_INCREASE`, `TARIFF_DECREASE`, `TARIFF_ADJUSTMENT`, `IMPORT_QUOTA`, `EXPORT_SUBSIDY`, `CURRENCY_DEVALUATION`
+- Modern (2024-2026): `TECH_EXPORT_CONTROL`, `INDUSTRIAL_SUBSIDY`, `SUPPLY_CHAIN_DIVERSIFICATION`, `GREEN_TECH_INVESTMENT`, `FRIEND_SHORING`, `DATA_SOVEREIGNTY`
 
 ### Economic Models
 
-The system implements various economic models to calculate impacts:
+The system implements several economic models:
 
-1. **Tariff Impacts**: Calculates how tariffs affect trade volumes, prices, and GDP
-2. **GDP Impacts**: Determines how trade actions influence economic growth
-3. **Trade Balances**: Tracks bilateral trade relationships
-4. **Stability Analysis**: Evaluates economic stability of countries and the global system
+1. **Tariff Impacts**: Price elasticity-based trade volume changes, tariff revenue, and deadweight loss
+2. **GDP Impacts**: `calculate_gdp_impact()` called per-action per-country each step
+3. **Trade Balances**: Bilateral flow tracking with trade-diversion logic for preferential agreements
+4. **Dynamic Indicators**: GDP growth (snapshot diff), unemployment (Okun's law), inflation (tariff-adjusted), composite confidence
+5. **Stability Analysis**: Country and global stability scores from multi-factor composite (0–1 scale)
 
 ### Simulation State
 
 The `SimulationState` class tracks all economic variables, including:
 
-- List of countries with economic indicators
+- List of countries with economic indicators (GDP, inflation, unemployment, confidence)
 - Current time (year and quarter)
-- Trade flows between countries
-- Active tariff policies
-- Economic indicators (GDP, inflation, unemployment, etc.)
+- Trade flows between countries with sector-level volumes
+- Active tariff policies (with step-based expiration via `_remove_expired_items()`)
 - Recent economic actions
 - Active external events
+- GDP snapshots for growth-rate calculations
 
 ### Event System
 
@@ -103,7 +103,7 @@ The simulation includes an `EventGenerator` that creates random or scheduled ext
 - Presidential elections
 - Global pandemics
 
-These events affect economic indicators across countries.
+These events affect economic indicators across countries and are governed by typed `EventConfig` objects with `trigger_time`, `one_time`, and sector fields.
 
 ## Decision Making Process
 
@@ -112,34 +112,36 @@ These events affect economic indicators across countries.
 When not using LLM integration, country agents make decisions based on rule sets:
 
 ```python
-# Example from ChinaAgent
-def decide_action(self, state: SimulationState) -> EconomicAction:
+# Example from ChinaAgent (rule-based fallback using ActionType enum)
+def _decide_without_llm(self, state: SimulationState) -> EconomicAction:
     # Check recent actions from US
     us_actions = [
-        action for action in state.recent_actions 
-        if action.country.name == "US" and action.target_country and 
+        action for action in state.recent_actions
+        if action.country.name == "US" and action.target_country and
         action.target_country.name == "China"
     ]
     
-    # If US increased tariffs, retaliate
-    if us_actions and us_actions[-1].action_type == "tariff_increase":
+    # If US increased tariffs or imposed controls, retaliate
+    if us_actions and us_actions[-1].action_type in (
+        ActionType.TARIFF_INCREASE, ActionType.TECH_EXPORT_CONTROL
+    ):
         return EconomicAction(
             country=self.country,
-            action_type="tariff_increase",
-            target_country=Country(name="US"),
-            sectors=us_action.sectors,
-            magnitude=us_action.magnitude * self.retaliatory_factor,
-            justification="Reciprocal measures in response to US tariffs"
+            action_type=ActionType.INDUSTRIAL_SUBSIDY,
+            target_country=None,
+            sectors=["semiconductors", "ai", "green_tech"],
+            magnitude=0.4,
+            justification="Strategic subsidy response to US pressure"
         )
     
-    # Otherwise focus on strategic sectors
+    # Otherwise invest in green tech leadership
     return EconomicAction(
         country=self.country,
-        action_type="investment",
+        action_type=ActionType.GREEN_TECH_INVESTMENT,
         target_country=None,
-        sectors=self.strategic_sectors,
-        magnitude=0.1,
-        justification="Strategic sector development"
+        sectors=["batteries", "green_tech", "automotive"],
+        magnitude=0.3,
+        justification="Continuing green technology leadership strategy"
     )
 ```
 
@@ -208,10 +210,16 @@ A stability score between 0-1 is calculated, where higher values indicate greate
 
 The system provides a REST API built with FastAPI for programmatic control:
 
-- Start/stop simulations
-- Control simulation parameters
-- Retrieve economic data
-- Apply manual policy changes
+- `POST /api/simulation/start` — start a simulation, returns `simulation_id`
+- `POST /api/simulation/{id}/step` — advance one quarter
+- `GET /api/simulation/{id}/state` — full simulation state
+- `GET /api/simulation/{id}/status` — lightweight status
+- `GET /api/simulation/{id}/stability` — stability scores
+- `GET /api/results/{id}` — full results summary
+- `GET /api/results/{id}/trade-flows` — bilateral trade flows
+- `GET /api/results/{id}/actions` — action history
+
+Session isolation is handled by `SimulationManager` — a module-level singleton that maps `simulation_id → SimulationEngine`. Interactive Swagger UI: `http://localhost:8000/docs`
 
 ### Dashboard
 
@@ -228,27 +236,28 @@ An interactive dashboard built with Streamlit allows users to:
 ### Starting a New Simulation
 
 ```python
-from tradewar.simulation import SimulationEngine
+from tradewar.simulation.engine import SimulationEngine
 from tradewar.economics.models import Country
 
-# Create country instances
+# Create country instances (2024 baseline GDPs in trillions USD)
 countries = [
-    Country(name="US", gdp=21.0, population=330000000),
-    Country(name="China", gdp=15.0, population=1400000000),
-    Country(name="Indonesia", gdp=1.0, population=270000000)
+    Country(name="US", gdp=28.8, population=335_000_000),
+    Country(name="China", gdp=17.8, population=1_400_000_000),
+    Country(name="Indonesia", gdp=1.42, population=275_000_000)
 ]
 
-# Initialize engine
+# Initialize engine (seeds random for reproducibility)
 engine = SimulationEngine(countries)
 
-# Run simulation for 20 quarters
+# Run simulation for 20 quarters (5 years)
 states = []
-for _ in range(20):
-    state = engine.step()
-    states.append(state)
+for year in range(2024, 2029):
+    for quarter in range(1, 5):
+        state = engine.step(year, quarter)
+        states.append(state)
 
 # Analyze results
-from tradewar.simulation import StabilityAnalyzer
+from tradewar.simulation.stability import StabilityAnalyzer
 analyzer = StabilityAnalyzer()
 for i, state in enumerate(states):
     stability, factors = analyzer.analyze_global_stability(state)

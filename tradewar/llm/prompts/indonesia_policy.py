@@ -2,7 +2,7 @@
 
 from typing import List
 
-from tradewar.economics.models import Country, EconomicAction
+from tradewar.economics.models import ActionType, Country, EconomicAction
 from tradewar.llm.prompts.base_prompt import (create_country_context,
                                              create_economic_context,
                                              create_simulation_context)
@@ -51,7 +51,8 @@ INDONESIAN GOVERNMENT POLICY PRIORITIES (2024-2026 ERA)
         for action in previous_actions[-5:]:  # Last 5 actions
             target = f" against {action.target_country.name}" if action.target_country else ""
             sectors = f" in {', '.join(action.sectors)}" if action.sectors else ""
-            policy_history += f"- {action.action_type}{target}{sectors} "
+            action_type = getattr(action.action_type, "value", str(action.action_type))
+            policy_history += f"- {action_type}{target}{sectors} "
             policy_history += f"({action.magnitude:.1%} magnitude). Justification: {action.justification}\n"
     else:
         policy_history += "No significant previous policy actions taken.\n"
@@ -119,20 +120,20 @@ create immediate opportunities or threats for Indonesia.
     # Identify potential opportunities
     opportunities = []
     
-    if any(action.action_type == "tariff_increase" for action in us_actions):
+    if any(action.action_type == ActionType.TARIFF_INCREASE for action in us_actions):
         affected_sectors = set()
         for action in us_actions:
-            if action.action_type == "tariff_increase":
+            if action.action_type == ActionType.TARIFF_INCREASE:
                 affected_sectors.update(action.sectors)
         
         opportunities.append(
             f"Potential to replace Chinese exports to US in: {', '.join(affected_sectors)}"
         )
     
-    if any(action.action_type == "tariff_increase" for action in china_actions):
+    if any(action.action_type == ActionType.TARIFF_INCREASE for action in china_actions):
         affected_sectors = set()
         for action in china_actions:
-            if action.action_type == "tariff_increase":
+            if action.action_type == ActionType.TARIFF_INCREASE:
                 affected_sectors.update(action.sectors)
         
         opportunities.append(

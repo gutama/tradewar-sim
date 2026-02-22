@@ -1,6 +1,7 @@
 """LLM client abstraction for interfacing with language model providers."""
 
 import logging
+import time
 from typing import Dict, List, Optional, Union
 
 from tradewar.config import config
@@ -70,9 +71,12 @@ class LLMClient:
         if self.provider == "openai":
             if not OPENAI_AVAILABLE:
                 raise ImportError("OpenAI package not installed. Run 'pip install openai'")
-            
-            openai.api_key = self.api_key
-            self.client = openai
+
+            if hasattr(openai, "OpenAI"):
+                self.client = openai.OpenAI(api_key=self.api_key)
+            else:
+                openai.api_key = self.api_key
+                self.client = openai
         
         elif self.provider == "anthropic":
             if not ANTHROPIC_AVAILABLE:
@@ -115,17 +119,37 @@ class LLMClient:
         """
         try:
             if self.provider == "openai":
-                return self._generate_openai(prompt, system_message, stop_sequences, **kwargs)
+                return self._with_retries(self._generate_openai, prompt, system_message, stop_sequences, **kwargs)
             elif self.provider == "anthropic":
-                return self._generate_anthropic(prompt, system_message, stop_sequences, **kwargs)
+                return self._with_retries(self._generate_anthropic, prompt, system_message, stop_sequences, **kwargs)
             elif self.provider == "litellm":
-                return self._generate_litellm(prompt, system_message, stop_sequences, **kwargs)
+                return self._with_retries(self._generate_litellm, prompt, system_message, stop_sequences, **kwargs)
             else:
                 raise ValueError(f"Unsupported provider: {self.provider}")
         
         except Exception as e:
             logger.error(f"Error generating LLM response: {str(e)}")
             return "ERROR: Unable to generate response from LLM."
+
+    def _with_retries(self, func, *args, **kwargs) -> str:
+        """Execute provider call with bounded retry/backoff behavior."""
+        delays = [1, 2, 4]
+        last_error: Optional[Exception] = None
+        for attempt, delay in enumerate(delays, start=1):
+            try:
+                return func(*args, **kwargs)
+            except Exception as exc:
+                last_error = exc
+                if attempt == len(delays):
+                    break
+                logger.warning(
+                    f"LLM call failed on attempt {attempt}/{len(delays)}: {exc}. Retrying in {delay}s"
+                )
+                time.sleep(delay)
+
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError("LLM call failed without exception context")
     
     def _generate_openai(
         self, 
@@ -142,6 +166,16 @@ class LLMClient:
         
         messages.append({"role": "user", "content": prompt})
         
+        if hasattr(self.client, "chat") and hasattr(self.client.chat, "completions"):
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=kwargs.get("temperature", self.temperature),
+                max_tokens=kwargs.get("max_tokens", self.max_tokens),
+                stop=stop_sequences,
+            )
+            return response.choices[0].message.content
+
         response = self.client.ChatCompletion.create(
             model=self.model,
             messages=messages,
@@ -149,7 +183,6 @@ class LLMClient:
             max_tokens=kwargs.get("max_tokens", self.max_tokens),
             stop=stop_sequences,
         )
-        
         return response.choices[0].message.content
     
     def _generate_anthropic(
@@ -161,16 +194,28 @@ class LLMClient:
     ) -> str:
         """Generate a response using Anthropic's API."""
         system = system_message or ""
-        
+
+        if hasattr(self.client, "messages"):
+            response = self.client.messages.create(
+                model=self.model,
+                system=system,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=kwargs.get("temperature", self.temperature),
+                max_tokens=kwargs.get("max_tokens", self.max_tokens),
+                stop_sequences=stop_sequences,
+            )
+            if response.content:
+                return response.content[0].text
+            return ""
+
         response = self.client.completions.create(
             model=self.model,
             prompt=f"\n\nHuman: {prompt}\n\nAssistant:",
-            system=system,
             temperature=kwargs.get("temperature", self.temperature),
             max_tokens_to_sample=kwargs.get("max_tokens", self.max_tokens),
             stop_sequences=stop_sequences or ["Human:"],
         )
-        
+
         return response.completion
     
     def _generate_litellm(

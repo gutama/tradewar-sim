@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 
+from tradewar.config import config
 from tradewar.economics.models import Country, TradeFlow, TariffPolicy
 
 # Use TYPE_CHECKING for circular imports
@@ -224,6 +225,19 @@ def _calculate_updated_trade_flow(
                 exporter_price_absorption = rate * 0.3
                 new_price = (1 + rate - exporter_price_absorption)
                 new_sector_values[sector] = new_sector_volumes[sector] * new_price
+
+    # Apply trade diversion effects from third-country tariff differentials
+    if config.trade_policy.enable_trade_diversion:
+        _apply_trade_diversion(
+            state=state,
+            exporter=exporter,
+            importer=importer,
+            previous_flow=previous_flow,
+            new_sector_volumes=new_sector_volumes,
+            new_sector_values=new_sector_values,
+            year=year,
+            quarter=quarter,
+        )
     
     # Apply base growth rate
     growth_rate = _calculate_base_growth_rate(exporter, importer, state)
@@ -240,6 +254,116 @@ def _calculate_updated_trade_flow(
         sector_volumes=new_sector_volumes,
         sector_values=new_sector_values
     )
+
+
+def _apply_trade_diversion(
+    state: "SimulationState",
+    exporter: Country,
+    importer: Country,
+    previous_flow: TradeFlow,
+    new_sector_volumes: Dict[str, float],
+    new_sector_values: Dict[str, float],
+    year: int,
+    quarter: int,
+) -> None:
+    """Apply trade diversion toward lower-tariff exporters for a given importer."""
+    intensity = config.trade_policy.trade_diversion_intensity
+    max_share = config.trade_policy.max_trade_diversion_share
+
+    for sector, current_volume in list(new_sector_volumes.items()):
+        if current_volume <= 0:
+            continue
+
+        base_volume = max(previous_flow.sector_volumes.get(sector, 0.0), 0.0)
+        if base_volume <= 0:
+            continue
+
+        current_tariff = _get_effective_tariff_rate(state, importer, exporter, sector)
+        total_diverted_volume = 0.0
+
+        for competitor in state.countries:
+            if competitor.name in {exporter.name, importer.name}:
+                continue
+
+            competitor_flow = _get_latest_trade_flow(
+                state=state,
+                exporter=competitor,
+                importer=importer,
+                year=year,
+                quarter=quarter,
+            )
+            if not competitor_flow:
+                continue
+
+            competitor_volume = competitor_flow.sector_volumes.get(sector, 0.0)
+            if competitor_volume <= 0:
+                continue
+
+            competitor_tariff = _get_effective_tariff_rate(state, importer, competitor, sector)
+            tariff_gap = competitor_tariff - current_tariff
+            if tariff_gap <= 0:
+                continue
+
+            diversion_share = min(max_share, max(0.0, tariff_gap * intensity))
+            diverted = competitor_volume * diversion_share
+
+            if _is_us_indonesia_pair(importer, exporter) and year >= config.trade_policy.us_indonesia_art_start_year:
+                diverted *= (1 + config.trade_policy.us_indonesia_access_preference)
+
+            total_diverted_volume += diverted
+
+        # Keep diversion bounded to avoid unrealistic quarter-to-quarter jumps
+        capped_diversion = min(total_diverted_volume, base_volume * max_share)
+        if capped_diversion <= 0:
+            continue
+
+        unit_value = 1.0
+        if current_volume > 0:
+            unit_value = max(new_sector_values.get(sector, 0.0), 0.0) / current_volume
+
+        new_sector_volumes[sector] += capped_diversion
+        new_sector_values[sector] += capped_diversion * unit_value
+
+
+def _get_effective_tariff_rate(
+    state: "SimulationState",
+    importer: Country,
+    exporter: Country,
+    sector: str,
+) -> float:
+    """Get effective tariff rate imposed by importer on exporter for a sector."""
+    policies = state.get_active_tariff_policies(importer, exporter)
+    if not policies:
+        return 0.0
+
+    return max((policy.sector_rates.get(sector, 0.0) for policy in policies), default=0.0)
+
+
+def _get_latest_trade_flow(
+    state: "SimulationState",
+    exporter: Country,
+    importer: Country,
+    year: int,
+    quarter: int,
+) -> Optional[TradeFlow]:
+    """Get latest available trade flow prior to the requested period."""
+    flows = [
+        flow for flow in state.trade_flows
+        if flow.exporter.name == exporter.name
+        and flow.importer.name == importer.name
+        and (flow.year < year or (flow.year == year and flow.quarter < quarter))
+    ]
+
+    if not flows:
+        return None
+
+    return max(flows, key=lambda flow: (flow.year, flow.quarter))
+
+
+def _is_us_indonesia_pair(importer: Country, exporter: Country) -> bool:
+    """Return True when the flow is between US and Indonesia in either direction."""
+    names = {importer.name, exporter.name}
+    return names == {"US", "Indonesia"}
 
 
 def _get_country_sector_weights(country: Country) -> Dict[str, float]:
@@ -352,10 +476,10 @@ def _calculate_base_growth_rate(
     importer_growth = 0.01  # Default 1% quarterly growth
     
     if exporter_indicators:
-        exporter_growth = exporter_indicators[-1].gdp_growth / 4  # Convert annual to quarterly
+        exporter_growth = exporter_indicators[-1].gdp_growth
     
     if importer_indicators:
-        importer_growth = importer_indicators[-1].gdp_growth / 4  # Convert annual to quarterly
+        importer_growth = importer_indicators[-1].gdp_growth
     
     # Growth is a weighted average of exporter's production capacity and importer's demand
     # Plus a small random component

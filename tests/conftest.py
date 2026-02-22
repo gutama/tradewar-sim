@@ -20,7 +20,7 @@ def mock_countries() -> List[Country]:
     countries = [
         Country(
             name="US",
-            gdp=21.0,
+            gdp=28.8,
             population=330_000_000,
             inflation_rate=0.02,
             unemployment_rate=0.04,
@@ -34,7 +34,7 @@ def mock_countries() -> List[Country]:
         ),
         Country(
             name="China",
-            gdp=15.0,
+            gdp=17.8,
             population=1_400_000_000, 
             inflation_rate=0.025,
             unemployment_rate=0.05,
@@ -48,7 +48,7 @@ def mock_countries() -> List[Country]:
         ),
         Country(
             name="Indonesia",
-            gdp=1.0,
+            gdp=1.42,
             population=270_000_000,
             inflation_rate=0.03,
             unemployment_rate=0.06,
@@ -67,6 +67,7 @@ def mock_countries() -> List[Country]:
 @pytest.fixture
 def mock_state(mock_countries: List[Country]) -> SimulationState:
     """Create a mock simulation state."""
+    random.seed(42)
     state = SimulationState(countries=mock_countries)
     
     # Add some initial trade flows

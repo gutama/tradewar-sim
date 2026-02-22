@@ -140,7 +140,7 @@ def _show_new_simulation_form():
         if include_us:
             countries.append({
                 "name": "US",
-                "gdp": 21.0,
+                "gdp": 28.8,
                 "population": 330000000,
                 "inflation_rate": 0.02,
                 "unemployment_rate": 0.04,
@@ -151,7 +151,7 @@ def _show_new_simulation_form():
         if include_china:
             countries.append({
                 "name": "China",
-                "gdp": 15.0,
+                "gdp": 17.8,
                 "population": 1400000000,
                 "inflation_rate": 0.025,
                 "unemployment_rate": 0.05,
@@ -162,7 +162,7 @@ def _show_new_simulation_form():
         if include_indonesia:
             countries.append({
                 "name": "Indonesia",
-                "gdp": 1.0,
+                "gdp": 1.42,
                 "population": 270000000,
                 "inflation_rate": 0.03,
                 "unemployment_rate": 0.06,
@@ -189,7 +189,7 @@ def _show_new_simulation_form():
             if response.status_code == 200:
                 simulation_id = response.json()
                 st.success(f"Simulation started with ID: {simulation_id}")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error(f"Failed to start simulation: {response.text}")
         except Exception as e:
@@ -217,7 +217,7 @@ def _show_simulation_controls(simulation_id: str):
             if response.status_code == 200:
                 st.sidebar.success("Advanced simulation by one quarter")
                 # Force refresh
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.sidebar.error(f"Failed to advance simulation: {response.text}")
         except Exception as e:
@@ -253,7 +253,7 @@ def _show_simulation_controls(simulation_id: str):
                 break
         
         # Force refresh after all steps
-        st.experimental_rerun()
+        st.rerun()
 
 
 def _show_simulation_results(simulation_id: str):

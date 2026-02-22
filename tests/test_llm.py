@@ -2,7 +2,7 @@
 
 import pytest
 
-from tradewar.economics.models import Country
+from tradewar.economics.models import ActionType, Country
 from tradewar.llm.client import LLMClient
 from tradewar.llm.parser import LLMResponseParser
 from tradewar.llm.prompts.base_prompt import (create_country_context,
@@ -51,7 +51,7 @@ def test_parser_extracts_action(mock_state):
     
     # Assert
     assert action is not None
-    assert action.action_type == "tariff_increase"
+    assert action.action_type == ActionType.TARIFF_INCREASE
     assert action.target_country.name == "China"
     assert "technology" in action.sectors
     assert "manufacturing" in action.sectors
