@@ -140,9 +140,9 @@ def _generate_synthetic_country_data(country_name: str) -> Dict:
     """Generate synthetic data for testing when real data is unavailable."""
     # Scale GDP and population based on country
     gdp_scale = {
-        "US": 21.0,
-        "China": 15.0,
-        "Indonesia": 1.0,
+        "US": 28.8,
+        "China": 17.8,
+        "Indonesia": 1.42,
     }.get(country_name, 1.0)
     
     pop_scale = {
